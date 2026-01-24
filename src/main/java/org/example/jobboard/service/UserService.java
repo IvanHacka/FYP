@@ -6,6 +6,7 @@ import org.example.jobboard.dto.Login;
 import org.example.jobboard.dto.UserRegisterRequest;
 import org.example.jobboard.model.User;
 import org.example.jobboard.repo.UserRepo;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,9 @@ public class UserService {
 
     private final UserRepo userRepo;
 
+    // Password hash
+    private final PasswordEncoder passwordEncoder;
+
     public User register(UserRegisterRequest userRegisterRequest) {
         if(userRepo.existsByEmail(userRegisterRequest.getEmail())) {
             // check if the email exist
@@ -21,7 +25,7 @@ public class UserService {
             throw new RuntimeException("Email address already in use");
         }
         User user = User.builder().email(userRegisterRequest.getEmail())
-                .password(userRegisterRequest.getPassword())
+                .password(passwordEncoder.encode(userRegisterRequest.getPassword()))
                 .role(userRegisterRequest.getRole())
                 .build();
         return userRepo.save(user);
