@@ -30,15 +30,14 @@ public class JobService {
     public Job postJob (Long employerId, Job jobData, List<JobSkill> skills){
         Employer employer = employerRepo.findById(employerId).orElseThrow(() -> new RuntimeException("Employer not found"));
 
-
-        // save job
         jobData.setEmployer(employer);
         jobData.setStatus(Job.JobStatus.OPEN);
         Job savedJob = jobRepo.save(jobData);
 
         // Bind skills with job
         for (JobSkill skill : skills) {
-            Skill skillList = skillRepo.findById(skill.getId()).orElseThrow(() -> new RuntimeException("Skill not found"));
+            Long skillId = skill.getSkill().getId();
+            Skill skillList = skillRepo.findById(skillId).orElseThrow(() -> new RuntimeException("Skill not found"));
 
             skill.setJob(savedJob);
             skill.setSkill(skillList);

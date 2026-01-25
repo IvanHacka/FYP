@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/employer/")
+@RequestMapping("/api/employers/")
 public class EmployerController {
     private final EmployerRepo employerRepo;
     private final UserRepo userRepo;

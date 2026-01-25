@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final UserService userService;
 
+    // POST
+    // api/auth/login
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody Login login) {
         User user = userService.login(login); // JavaScript look at the role and token

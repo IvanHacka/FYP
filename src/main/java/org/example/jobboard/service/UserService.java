@@ -34,7 +34,7 @@ public class UserService {
     public User login(Login login) {
         User user = userRepo.findByEmail(login.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
-        if(!user.getPassword().equals(login.getPassword())) {
+        if(!passwordEncoder.matches(user.getPassword(), login.getPassword())) {
             throw new RuntimeException("Incorrect email or password");
         }
 

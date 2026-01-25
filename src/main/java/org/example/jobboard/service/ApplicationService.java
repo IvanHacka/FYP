@@ -31,7 +31,7 @@ public class ApplicationService {
         Employee employee = employeeRepo.findById(employeeId).orElseThrow(() ->
                 new RuntimeException("Employee " + employeeId + " not found"));
 
-        BigDecimal score = matchingService.calcuateMatchScore(jobId, employeeId);
+        BigDecimal score = matchingService.calculateMatchScore(jobId, employeeId);
         Application application = Application.builder()
                 .job(job).employee(employee).matchScore(score).build();
         return applicationRepo.save(application);

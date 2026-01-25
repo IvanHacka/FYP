@@ -28,7 +28,7 @@ public class Application {
     private Job job;
 
     @ManyToOne
-    @JoinColumn(name = "employee", nullable = false)
+    @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
     @Column(name = "match_score")

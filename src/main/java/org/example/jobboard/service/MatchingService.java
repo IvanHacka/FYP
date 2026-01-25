@@ -25,7 +25,7 @@ public class MatchingService {
     private final JobSkillRepo jobSkillRepo;
     private final EmployeeSkillRepo employeeskillRepo;
 
-    public BigDecimal calcuateMatchScore(Long jobId, Long employeeId){
+    public BigDecimal calculateMatchScore(Long jobId, Long employeeId){
         List<JobSkill> jobSkills = jobSkillRepo.findByJobId(jobId);
         List<EmployeeSkill> employeeSkills = employeeskillRepo.findByEmployeeId(employeeId);
 
@@ -45,18 +45,18 @@ public class MatchingService {
 
         for (JobSkill jobSkill : jobSkills) {
             int importance = jobSkill.getImportanceLevel();
-            total += importance * 5.0; // importance of the skill * maximum proficiency level
+            total += (importance * 5.0); // importance of the skill * maximum proficiency level
 
             Long skillId = jobSkill.getSkill().getId();
             if (employeeSkillMap.containsKey(skillId)){
                 int proficiency = employeeSkillMap.get(skillId);
-                proficiency += Math.min(proficiency, 5); // Cap 5 just in case
-                earned += proficiency * importance;
+                proficiency = Math.min(proficiency, 5); // Cap 5 just in case (will set a limit in frontend)
+                earned += (proficiency * importance);
             }
         }
 
         if (total == 0){
-            return BigDecimal.ZERO;
+            return BigDecimal.valueOf(100.00);
         }
 
         double matchPercentage = (earned / total) * 100;

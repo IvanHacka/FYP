@@ -1,6 +1,7 @@
 package org.example.jobboard.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,12 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "employees")
 
 public class Employee {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "employees_id")
+    @Column(name = "employee_id")
     private Long id;
 
     @OneToOne
@@ -27,7 +29,7 @@ public class Employee {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    // Should be a url
+    // Should be an url
     private String cv;
 
     @Column(columnDefinition = "TEXT")

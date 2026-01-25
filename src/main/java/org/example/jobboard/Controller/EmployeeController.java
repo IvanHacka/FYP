@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 
 @RequiredArgsConstructor
-@RequestMapping("/api/employee")
+@RequestMapping("/api/employees")
 public class EmployeeController {
     private final EmployeeService employeeService;
+    // POST
+    // api/employee/profile
     @PostMapping("/profile")
     ResponseEntity<Employee> createProfile(@RequestBody EmployeeProfileRequest employeeProfileRequest) {
         return ResponseEntity.ok(employeeService.createProfile(employeeProfileRequest));
