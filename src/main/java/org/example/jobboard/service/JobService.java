@@ -13,6 +13,7 @@ import org.example.jobboard.repo.JobSkillRepo;
 import org.example.jobboard.repo.SkillRepo;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 // Job creation
