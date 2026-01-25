@@ -50,4 +50,9 @@ public class JobService {
         return jobRepo.findByStatus(Job.JobStatus.OPEN);
     }
 
+    // search jobs
+    public List<Job> searchJobs(String title, String location, BigDecimal salary){
+        return jobRepo.search(title, location, salary);
+    }
+
 }
