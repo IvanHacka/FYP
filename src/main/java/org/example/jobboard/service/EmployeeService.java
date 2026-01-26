@@ -14,7 +14,9 @@ import org.example.jobboard.repo.EmployeeRepo;
 import org.example.jobboard.repo.EmployeeSkillRepo;
 import org.example.jobboard.repo.SkillRepo;
 import org.example.jobboard.repo.UserRepo;
+import org.example.jobboard.util.FileStorageUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class EmployeeService {
     private final UserRepo userRepo;
     private final SkillRepo skillRepo;
     private final EmployeeSkillRepo employeeSkillRepo;
+    private final FileStorageUtil fileStorageUtil;
 
 
     // Profile and skills save together
@@ -55,5 +58,19 @@ public class EmployeeService {
             }
         }
         return savedEmployee;
+    }
+
+    // CV upload with FileStorageUtil
+    public Employee cvUpload(Long employeeId, MultipartFile file) {
+        try{
+            String fileName = fileStorageUtil.saveFile(file);
+            Employee employee = employeeRepo.findById(employeeId).orElseThrow
+                    (() -> new RuntimeException("Employee not found"));
+            employee.setCv(fileName);
+            return employeeRepo.save(employee);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Having trouble saving file. Error: ", e);
+        }
     }
 }
