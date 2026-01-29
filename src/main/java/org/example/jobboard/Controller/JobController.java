@@ -23,6 +23,7 @@ public class JobController {
     // POST
     // api/jobs
     @PostMapping
+    // employer
     public ResponseEntity<Job> postJob (@RequestBody JobRequest jobRequest) {
         Job jobData = Job.builder()
                 .title(jobRequest.getTitle()).description(jobRequest.getDescription())
@@ -36,8 +37,18 @@ public class JobController {
             return JobSkill.builder().skill(skill).importanceLevel(s.getImportanceLevel())
                     .build();
         }).toList();
+
         Job savedJob = jobService.postJob(jobRequest.getEmployerId(), jobData, requiredSkill);
         return ResponseEntity.ok(savedJob);
+    }
+
+    // POST
+    // api/jobs
+    public ResponseEntity<Job> createJob(@RequestBody Job job) {
+        // We explicitly set the status to OPEN when a job is created
+        job.setStatus(Job.JobStatus.OPEN);
+        job.setPostedAt(java.time.LocalDateTime.now());
+        return ResponseEntity.ok(jobService.createJob(job));
     }
 
     // GET
