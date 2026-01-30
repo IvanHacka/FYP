@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 public class JobSkill {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

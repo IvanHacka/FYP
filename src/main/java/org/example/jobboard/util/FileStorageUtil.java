@@ -1,10 +1,13 @@
 package org.example.jobboard.util;
 
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,5 +31,19 @@ public class FileStorageUtil {
         Path path = uploadPath.resolve(fileName);
         Files.copy(file.getInputStream(), path);
         return fileName; // return a unique file name to save
+    }
+
+    public Resource loadFileAsResource(String fileName) {
+        try {
+            Path filePath = Paths.get(UPLOAD_DIRECTORY).resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists()) {
+                return resource;
+            } else {
+                throw new RuntimeException("File not found " + fileName);
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("File not found " + fileName, e);
+        }
     }
 }

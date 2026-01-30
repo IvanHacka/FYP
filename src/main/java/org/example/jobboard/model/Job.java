@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 public class Job {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "job_id")
     private Long id;
 

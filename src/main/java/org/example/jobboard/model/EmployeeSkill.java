@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "employeeSkills")
 public class EmployeeSkill {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

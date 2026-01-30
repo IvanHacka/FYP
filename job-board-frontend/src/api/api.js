@@ -27,6 +27,9 @@ export const fetchJobs = (filters = {}) => {
     const params = new URLSearchParams(filters).toString();
     return api.get(`/jobs/search?${params}`);
 };
+export const fetchApplications = (jobId) => {
+    return api.get(`/applications/job/${jobId}`);
+};
 export const applyJob = (jobId, employeeId) => {
     return api.post(`/applications/apply?jobId=${jobId}&employeeId=${employeeId}`);
 };
@@ -43,5 +46,10 @@ export const uploadCv = (userId, file) => {
             'Content-Type': 'multipart/form-data',
         },
     });
+};
+
+// no axios only link
+export const getCvDownloadUrl = (fileName) => {
+    return `http://localhost:8080/api/employees/cv/${fileName}`;
 };
 export default api;

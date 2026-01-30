@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "applications")
 public class Application {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "application_id")
     private Long id;
 

@@ -28,6 +28,10 @@ public class UserService {
                 .password(passwordEncoder.encode(userRegisterRequest.getPassword()))
                 .role(userRegisterRequest.getRole())
                 .build();
+
+        // Employer -> lock account first
+        // Employee -> auto approved
+        user.setActive(user.getRole() != User.Role.EMPLOYER);
         return userRepo.save(user);
     }
 

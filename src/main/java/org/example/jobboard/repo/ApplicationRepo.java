@@ -7,11 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ApplicationRepo extends JpaRepository<Application, Long>{
-    List<Application> findByJobId(Long id); // Find who apply to the job
+    List<Application> findByJobId(Long id);
+    // Find who apply to the job
 
-    List<Application> findByEmployeeId(Long id); // Find what jobs the employee applied to
+    List<Application> findByEmployeeId(Long id);
+    // Find what jobs the employee applied to
 
-    boolean existsByEmployeeIdAndJobId(Long employeeId, Long jobId); // Check if an employee has applied to the job
+    boolean existsByEmployeeIdAndJobId(Long employeeId, Long jobId);
+    // Check if an employee has applied to the job
                                                                         // Prevent duplicate applications
 
 }
