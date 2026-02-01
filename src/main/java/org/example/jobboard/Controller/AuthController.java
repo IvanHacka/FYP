@@ -9,6 +9,8 @@ import org.example.jobboard.service.JwtService;
 import org.example.jobboard.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,13 +31,20 @@ public class AuthController {
     // POST
     // api/auth/login
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody Login login) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
-        );
-        User user = (User) userDetailsService.loadUserByUsername(login.getEmail());
-
-        String token = jwtService.generateToken(user.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token, user.getRole().name(), user.getId(), user.getUsername()));
-    }
+    public ResponseEntity<?> login(@RequestBody Login login) {
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
+            );
+            User user = (User) userDetailsService.loadUserByUsername(login.getEmail());
+            String token = jwtService.generateToken(user.getUsername());
+            return ResponseEntity.ok(new AuthResponse(token, user.getRole().name(), user.getId(), user.getUsername()));
+        }
+        catch(DisabledException e){
+            return ResponseEntity.status(403).body("Account disabled. Please wait for approval.");
+        }
+        catch(BadCredentialsException e){
+            return ResponseEntity.status(401).body("Invalid email or password.");
+        }
+        }
 }

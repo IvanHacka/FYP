@@ -17,20 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/employers/")
 public class EmployerController {
-    private final EmployerRepo employerRepo;
     private final UserRepo userRepo;
 
     // POST
     // api/employer/profile
     @PostMapping("/profile")
-    public ResponseEntity<Employer> creteProfile(@RequestBody EmployerProfileRequest employerProfileRequest) {
+    public ResponseEntity<User> creteProfile(@RequestBody EmployerProfileRequest employerProfileRequest) {
+        // Existing user
         User user = userRepo.findById(employerProfileRequest.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
-        Employer employer = Employer.builder().user(user)
-                .companyName(employerProfileRequest.getCompanyName())
-                .companyWebsite(employerProfileRequest.getCompanyWebsite())
-                .description(employerProfileRequest.getDescription())
-                .build();
-
-        return ResponseEntity.ok(employerRepo.save(employer));
+        // Add field
+        user.setCompanyName(employerProfileRequest.getCompanyName());
+        user.setCompanyWebsite(employerProfileRequest.getCompanyWebsite());
+        user.setDescription(employerProfileRequest.getDescription());
+        return ResponseEntity.ok(userRepo.save(user));
     }
 }

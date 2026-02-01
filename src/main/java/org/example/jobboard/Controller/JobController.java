@@ -33,30 +33,29 @@ public class JobController {
     @PostMapping
     // employer
     public ResponseEntity<Job> postJob (@RequestBody JobRequest jobRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        // Current user
         User user = userRepo.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if(user.getRole() != User.Role.EMPLOYER){
             return ResponseEntity.status(403).build();
         }
-        Job jobData = Job.builder()
-                .title(jobRequest.getTitle()).description(jobRequest.getDescription())
-                .minSalary(jobRequest.getMinSalary())
-                .location(jobRequest.getLocation()).status(Job.JobStatus.OPEN)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-
-        List<JobSkill> requiredSkill = new ArrayList<>();
-        if(jobRequest.getSkills() != null){
-            requiredSkill = jobRequest.getSkills().stream().map(s -> {
-                Skill skill = Skill.builder().id(s.getSkillId()).build();
-                return JobSkill.builder().skill(skill).importanceLevel(s.getImportanceLevel())
-                        .build();
-            }).toList();
-
-        }
-
-        Job savedJob = jobService.postJob(user.getId(), jobData, requiredSkill);
+//        Job jobData = Job.builder()
+//                .title(jobRequest.getTitle()).description(jobRequest.getDescription())
+//                .minSalary(jobRequest.getMinSalary())
+//                .location(jobRequest.getLocation()).status(Job.JobStatus.OPEN)
+//                .createdAt(LocalDateTime.now())
+//                .build();
+//
+//        List<JobSkill> requiredSkill = new ArrayList<>();
+//        if(jobRequest.getSkills() != null){
+//            requiredSkill = jobRequest.getSkills().stream().map(s -> {
+//                Skill skill = Skill.builder().id(s.getSkillId()).build();
+//                return JobSkill.builder().skill(skill).importanceLevel(s.getImportanceLevel())
+//                        .build();
+//            }).toList();
+        // confirm this user want to post a job on their account
+        jobRequest.setEmployerId(user.getId());
+        Job savedJob = jobService.postJob(jobRequest);
         return ResponseEntity.ok(savedJob);
     }
 

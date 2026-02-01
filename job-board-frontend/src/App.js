@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
-import {login, register, fetchJobs, applyJob, uploadCv, createJob, fetchApplications, getCvDownloadUrl} from './api/api';
+import React, {useState, useEffect} from 'react';
+import {login, register, fetchJobs, applyJob, uploadCv, createJob, fetchApplications, getCvDownloadUrl, fetchPendingEmployers, approveEmployers} from './api/api';
 
 function App() {
+  // localStorage.clear()
   // login and register
   const [isLoginView, setIsLoginView] = useState(true);
   const [fullName, setFullName] = useState('');
@@ -15,7 +16,14 @@ function App() {
   const [newJob, setNewJob] = useState({title: '', description: '', location: '', salaryMin: 0});
   const [applications, setApplications] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
+  // admin
+  const [pendingEmployers, setPendingEmployers] = useState([]);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  useEffect(() => {
+    if (role === 'ADMIN' && token) {
+      loadPendingEmployers();
+    }
+  }, [role, token]);
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -37,12 +45,23 @@ function App() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
       localStorage.setItem('username', data.username)
+      localStorage.setItem('role', data.role)
       setToken(data.token);
       setUserId(data.userId);
+      setUsername(data.username);
+      setRole(data.role);
       alert(`Welcome back! ${data.username}`);
     } catch (error) {
-      alert('Login Failed! Incorrect username or password');
-      console.error(error);
+      const errorMsg = error.response?.data || "Login failed";
+      if(error.response?.status === 403 && errorMsg.includes("disabled")){
+        alert('Access denied! You account is waiting for approval.');
+      }
+      else if(error.response?.status === 401){
+        alert('Login Failed! Incorrect username or password');
+      }
+      else{
+        alert("Error: " + errorMsg);
+      }
     }
   };
   const handlePostJob = async (e) => {
@@ -109,6 +128,41 @@ function App() {
       // check error
       const message = error.response?.data?.message || 'Application Failed';
       alert(message);
+    }
+  };
+
+  // Load the list of pending employers
+  // const loadPendingEmployers = async () => {
+  //   try {
+  //     const response = await fetchPendingEmployers();
+  //     setPendingEmployers(response.data);
+  //   } catch (error) {
+  //     console.error("Failed to fetch pending users", error);
+  //   }
+  // };
+  const loadPendingEmployers = async () => {
+    try {
+      const response = await fetchPendingEmployers();
+      console.log("📢 ADMIN API RESPONSE:", response.data); // 👈 Check this log!
+      setPendingEmployers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch pending users", error);
+      alert("Error fetching list: " + (error.response?.data || error.message));
+    }
+  };
+
+  // approve onclick
+  const handleApprove = async (userId) => {
+    if(!window.confirm("Are you sure you want to approve this employer?")) return;
+
+    try {
+      console.log("Attempting to approve user ID:", userId);
+      await approveEmployers(userId);
+      alert("User Approved!");
+      loadPendingEmployers(); // Refresh the list
+    } catch (error) {
+      console.log(error)
+      alert("Failed to approve.");
     }
   };
 
@@ -224,9 +278,49 @@ function App() {
                       </form>
                     </div>
                 )}
-
-              {/*  CV */}
               </div>
+              {role === 'ADMIN' && (
+                  <div style={{ padding: '20px', backgroundColor: '#fff3e0', border: '2px solid #ffb74d', borderRadius: '8px', marginBottom: '20px' }}>
+                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                      <h2 style={{ color: '#e65100', margin: 0 }}>🛡️ Admin Dashboard</h2>
+                      <button onClick={loadPendingEmployers} style={{ padding: '8px', cursor: 'pointer' }}>Refresh List</button>
+                    </div>
+
+                    <p>Manage pending employer registrations.</p>
+
+                    {pendingEmployers.length === 0 ? (
+                        <p><i>No pending approvals.</i></p>
+                    ) : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px', background: 'white' }}>
+                          <thead>
+                          <tr style={{ background: '#ffcc80' }}>
+                            <th style={{padding: '10px', border: '1px solid #ddd'}}>ID</th>
+                            <th style={{padding: '10px', border: '1px solid #ddd'}}>Email</th>
+                            <th style={{padding: '10px', border: '1px solid #ddd'}}>Date Joined</th>
+                            <th style={{padding: '10px', border: '1px solid #ddd'}}>Action</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {pendingEmployers.map(user => (
+                              <tr key={user.id}>
+                                <td style={{padding: '10px', border: '1px solid #ddd', textAlign:'center'}}>{user.id}</td>
+                                <td style={{padding: '10px', border: '1px solid #ddd'}}>{user.email}</td>
+                                <td style={{padding: '10px', border: '1px solid #ddd'}}>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td style={{padding: '10px', border: '1px solid #ddd', textAlign:'center'}}>
+                                  <button
+                                      onClick={() => handleApprove(user.id)}
+                                      style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer', borderRadius: '4px' }}>
+                                    ✅ Approve
+                                  </button>
+                                </td>
+                              </tr>
+                          ))}
+                          </tbody>
+                        </table>
+                    )}
+                  </div>
+              )}
+              {/*  CV */}
               {role === 'EMPLOYEE' && (
                 <div style={{marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px'}}>
                   <h3>My Profile</h3>

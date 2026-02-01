@@ -24,14 +24,26 @@ public class UserService {
             // return error message if so
             throw new RuntimeException("Email address already in use");
         }
-        User user = User.builder().email(userRegisterRequest.getEmail())
+        String companyName = null;
+        if(userRegisterRequest.getRole() == User.Role.EMPLOYER) {
+            if(userRegisterRequest.getCompanyName() == null || userRegisterRequest.getCompanyName().isEmpty()) {
+                throw new IllegalArgumentException("Company name cannot be empty for Employers");
+            }
+            companyName = userRegisterRequest.getCompanyName();
+        }
+
+        // build to match User.java
+        User user = User.builder().fullName(userRegisterRequest.getFullName())
+                .email(userRegisterRequest.getEmail())
                 .password(passwordEncoder.encode(userRegisterRequest.getPassword()))
                 .role(userRegisterRequest.getRole())
+                // Employer -> lock account first
+                // Employee -> auto approved
+                .isActive(userRegisterRequest.getRole() != User.Role.EMPLOYER)
+                .companyName(companyName)
                 .build();
 
-        // Employer -> lock account first
-        // Employee -> auto approved
-        user.setActive(user.getRole() != User.Role.EMPLOYER);
+
         return userRepo.save(user);
     }
 

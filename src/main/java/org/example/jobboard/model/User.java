@@ -37,6 +37,9 @@ public class User implements UserDetails {
 //    @Column(name = "last_name", nullable = false, length = 50)
 //    private String lastName;
 
+    @Column(name = "full_name", nullable = false, length = 50)
+    private String fullName;
+
     @Email(message = "Email has to be valid")
     @NotBlank(message = "Email is required")
     @Column(nullable = false, unique = true)
@@ -51,11 +54,26 @@ public class User implements UserDetails {
 
     // Dont let user login until admin approve
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private boolean isActive = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "company_name")
+    private String companyName;
+
+    @Column(name = "company_website")
+    private String companyWebsite;
+
+    @Column(name = "company_description", columnDefinition = "TEXT")
+    private String description;
+
+    // Should be an url or employee cv
+    private String cv;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
 
 
     // add to match Userdetails

@@ -5,10 +5,16 @@ const api = axios.create({
     baseURL: API_URL
 });
 
-// attach token to header
+// attach jwt token to header
 api.interceptors.request.use((config) => {
     // browser cache
     const token = localStorage.getItem('token');
+    console.log("📢 SENDING TOKEN:", token);
+    if (token) {
+        console.log("🚀 SENDING TOKEN starting with:", token.substring(0, 15) + "...");
+    } else {
+        console.log("⚠️ NO TOKEN FOUND in LocalStorage");
+    }
     if(token){
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -52,4 +58,13 @@ export const uploadCv = (userId, file) => {
 export const getCvDownloadUrl = (fileName) => {
     return `http://localhost:8080/api/employees/cv/${fileName}`;
 };
+
+// admin
+export const fetchPendingEmployers = () => {
+    return api.get('/admin/pending');
+};
+export const approveEmployers = (userId) => {
+    return api.put(`/admin/approveEmployers/${userId}`);
+};
+
 export default api;

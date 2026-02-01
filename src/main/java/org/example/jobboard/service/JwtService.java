@@ -7,9 +7,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
@@ -19,12 +19,13 @@ import java.util.function.Function;
 // Create token when users login
 @Service
 public class JwtService {
-    @Value("ThisIsASuperLongKeyForFypJobBoardProject1") private String secret;
-    @Value("864000") private int expiration;
+//    @Value("404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970") private String secret;
+    private static final String secret = "ThisIsAVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLong123";
+    @Value("86400000") private int expiration;
     public String generateToken(String username){
         return Jwts.builder().setSubject(username).setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256).compact();
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
     private Key getSigningKey() {
@@ -54,9 +55,9 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    public boolean isValidToken(String token, String username){
+    public boolean isValidToken(String token, UserDetails userDetails){
         final String extractedUser = extractUsername(token);
-        return (extractedUser.equals(username) && !isTokenExpired(token));
+        return (extractedUser.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
 

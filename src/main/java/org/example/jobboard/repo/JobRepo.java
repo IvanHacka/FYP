@@ -1,6 +1,7 @@
 package org.example.jobboard.repo;
 
 import org.example.jobboard.model.Job;
+import org.example.jobboard.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import java.util.List;
 public interface JobRepo extends JpaRepository<Job, Long>{
     List<Job> findByStatus(Job.JobStatus status); // example -> get all OPEN
     List<Job> findByEmployerId(Long id); // Get job posted by the employer
+    List<Job> findByEmployer(User employer);
 
     // search feature with SQL Query
     // status = "OPEN"

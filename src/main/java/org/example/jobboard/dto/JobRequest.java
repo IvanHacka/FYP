@@ -12,5 +12,7 @@ public class JobRequest {
     private String description;
     private BigDecimal minSalary;
     private String location;
+    private Long employerId;
     private List<SkillRequest> skills;
+
 }

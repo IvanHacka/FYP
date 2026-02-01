@@ -29,7 +29,7 @@ public class Job {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employer_id", nullable = false)
-    private Employer employer;
+    private User employer;
 
     @Column(nullable = false)
     private String title;
@@ -39,9 +39,6 @@ public class Job {
 
     @Column(name = "min_salary")
     private BigDecimal minSalary;
-
-    @Column(name = "max_salary")
-    private BigDecimal maxSalary;
 
     private String location;
 
