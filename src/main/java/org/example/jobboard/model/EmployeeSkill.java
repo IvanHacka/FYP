@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -19,8 +22,8 @@ public class EmployeeSkill {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "skill_id", nullable = false)

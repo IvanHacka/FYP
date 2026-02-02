@@ -3,9 +3,7 @@ package org.example.jobboard.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.EmployerProfileRequest;
-import org.example.jobboard.model.Employer;
 import org.example.jobboard.model.User;
-import org.example.jobboard.repo.EmployerRepo;
 import org.example.jobboard.repo.UserRepo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

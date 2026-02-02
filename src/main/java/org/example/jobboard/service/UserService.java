@@ -2,6 +2,7 @@ package org.example.jobboard.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.jobboard.dto.AuthResponse;
 import org.example.jobboard.dto.Login;
 import org.example.jobboard.dto.UserRegisterRequest;
 import org.example.jobboard.model.User;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepo userRepo;
+    private final JwtService jwtService;
 
     // Password hash
     private final PasswordEncoder passwordEncoder;
@@ -47,14 +49,28 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public User login(Login login) {
+    public AuthResponse login(Login login) {
+        // Find User
         User user = userRepo.findByEmail(login.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
-        if(!passwordEncoder.matches(user.getPassword(), login.getPassword())) {
+        // Check Password
+        if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
             throw new RuntimeException("Incorrect email or password");
         }
+        // Check if Approved
+        if (!user.isActive()) {
+            throw new RuntimeException("Account is pending approval");
+        }
+        // Generate Token
+        String token = jwtService.generateToken(user.getUsername());
 
-        return user;
+        // Return the Response DTO to forntend
+        return new AuthResponse(
+                token,
+                user.getRole().name(),
+                user.getId(),
+                user.getEmail()
+        );
     }
 
 }

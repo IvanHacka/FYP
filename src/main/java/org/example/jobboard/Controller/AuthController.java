@@ -4,6 +4,7 @@ package org.example.jobboard.Controller;
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.AuthResponse;
 import org.example.jobboard.dto.Login;
+import org.example.jobboard.dto.UserRegisterRequest;
 import org.example.jobboard.model.User;
 import org.example.jobboard.service.JwtService;
 import org.example.jobboard.service.UserService;
@@ -33,18 +34,27 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Login login) {
         try{
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
-            );
-            User user = (User) userDetailsService.loadUserByUsername(login.getEmail());
-            String token = jwtService.generateToken(user.getUsername());
-            return ResponseEntity.ok(new AuthResponse(token, user.getRole().name(), user.getId(), user.getUsername()));
+            // handle auth and token generation
+            AuthResponse response = userService.login(login);
+            return ResponseEntity.ok(response);
         }
-        catch(DisabledException e){
-            return ResponseEntity.status(403).body("Account disabled. Please wait for approval.");
+        catch(RuntimeException e){
+            if(e.getMessage().contains("pending") || e.getMessage().contains("disabled")){
+                return ResponseEntity.status(403).body(e.getMessage());
+            }
+            else if(e.getMessage().contains("Incorrect")){
+                return ResponseEntity.status(401).body("Invalid email or password");
+            }
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        catch(BadCredentialsException e){
-            return ResponseEntity.status(401).body("Invalid email or password.");
+    }
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserRegisterRequest userRegisterRequest) {
+        try{
+            return ResponseEntity.ok(userService.register(userRegisterRequest));
         }
+        catch(RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
 }

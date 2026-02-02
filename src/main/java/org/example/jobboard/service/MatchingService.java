@@ -25,9 +25,9 @@ public class MatchingService {
     private final JobSkillRepo jobSkillRepo;
     private final EmployeeSkillRepo employeeskillRepo;
 
-    public BigDecimal calculateMatchScore(Long jobId, Long employeeId){
+    public BigDecimal calculateMatchScore(Long jobId, Long userId){
         List<JobSkill> jobSkills = jobSkillRepo.findByJobId(jobId);
-        List<EmployeeSkill> employeeSkills = employeeskillRepo.findByEmployeeId(employeeId);
+        List<EmployeeSkill> employeeSkills = employeeskillRepo.findByUserId(userId);
 
         if (jobSkills.isEmpty()){
             return BigDecimal.valueOf(100.00);

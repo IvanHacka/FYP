@@ -14,7 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -74,6 +76,14 @@ public class User implements UserDetails {
 
     @Column(columnDefinition = "TEXT")
     private String bio;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_skills",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    private Set<Skill> skills = new HashSet<>();
 
 
     // add to match Userdetails

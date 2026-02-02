@@ -10,10 +10,10 @@ public interface ApplicationRepo extends JpaRepository<Application, Long>{
     List<Application> findByJobId(Long id);
     // Find who apply to the job
 
-    List<Application> findByEmployeeId(Long id);
-    // Find what jobs the employee applied to
+    List<Application> findByApplicantId(Long id);
+    // Find what jobs the applicant applied to
 
-    boolean existsByEmployeeIdAndJobId(Long employeeId, Long jobId);
+    boolean existsByApplicantIdAndJobId(Long employeeId, Long jobId);
     // Check if an employee has applied to the job
                                                                         // Prevent duplicate applications
 

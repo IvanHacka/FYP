@@ -23,7 +23,7 @@ api.interceptors.request.use((config) => {
 
 // api
 export const register = (userData) => {
-    return api.post('/users/register', userData);
+    return api.post('/auth/register', userData);
 }
 export const login = (email, password) => {
     return api.post('/auth/login', {email, password});

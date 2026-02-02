@@ -53,7 +53,7 @@ function App() {
       alert(`Welcome back! ${data.username}`);
     } catch (error) {
       const errorMsg = error.response?.data || "Login failed";
-      if(error.response?.status === 403 && errorMsg.includes("disabled")){
+      if(error.response?.status === 403){
         alert('Access denied! You account is waiting for approval.');
       }
       else if(error.response?.status === 401){

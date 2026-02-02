@@ -28,8 +28,8 @@ public class Application {
     private Job job;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User applicant;
 
     @Column(name = "match_score")
     private BigDecimal matchScore;

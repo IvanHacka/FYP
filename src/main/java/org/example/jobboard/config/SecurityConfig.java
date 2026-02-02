@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/users/register", "/api/jobs/search", "/api/jobs").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/jobs/search", "/api/jobs").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // Other request require token
                 )

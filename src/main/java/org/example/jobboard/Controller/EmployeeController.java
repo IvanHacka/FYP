@@ -1,15 +1,17 @@
 package org.example.jobboard.Controller;
 
 
+import org.example.jobboard.model.User;
 import org.example.jobboard.util.FileStorageUtil;
 import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.EmployeeProfileRequest;
-import org.example.jobboard.model.Employee;
 import org.example.jobboard.service.EmployeeService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,14 +25,14 @@ public class EmployeeController {
     // POST
     // api/employees/profile
     @PostMapping("/profile")
-    ResponseEntity<Employee> createProfile(@RequestBody EmployeeProfileRequest employeeProfileRequest) {
-        return ResponseEntity.ok(employeeService.createProfile(employeeProfileRequest));
+    ResponseEntity<User> createProfile(@RequestBody EmployeeProfileRequest employeeProfileRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(employeeService.createProfile(employeeProfileRequest, userDetails.getUsername()));
     }
 
     // POST
     // api/employees/{id}/cv
     @PostMapping("/{id}/cv")
-    public ResponseEntity<Employee> updateProfile(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<User> updateProfile(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(employeeService.cvUpload(id, file));
     }
 
