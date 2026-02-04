@@ -9,6 +9,7 @@ import org.example.jobboard.model.Skill;
 import org.example.jobboard.model.User;
 import org.example.jobboard.repo.UserRepo;
 import org.example.jobboard.service.JobService;
+import org.example.jobboard.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,7 @@ import java.util.List;
 public class JobController {
     private final JobService jobService;
     private final UserRepo userRepo;
+    private final UserService userService;
 
 
     // POST
@@ -74,5 +76,14 @@ public class JobController {
                                                 @RequestParam(required = false) BigDecimal salary)
     {
         return ResponseEntity.ok(jobService.searchJobs(title, location, salary));
+    }
+
+    // GET
+    // api/jobs/myJobs
+    @GetMapping("/myJobs")
+    public ResponseEntity<List<Job>> getMyJobs(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        User employer = userService.getUserByEmail(email);
+        return ResponseEntity.ok(jobService.getJobsByEmployer(employer.getId()));
     }
 }

@@ -36,12 +36,20 @@ export const fetchJobs = (filters = {}) => {
 export const fetchApplications = (jobId) => {
     return api.get(`/applications/job/${jobId}`);
 };
-export const applyJob = (jobId, employeeId) => {
-    return api.post(`/applications/apply?jobId=${jobId}&employeeId=${employeeId}`);
+export const applyJob = (jobId, userId) => {
+    // return api.post(`/applications/apply?jobId=${jobId}&employeeId=${employeeId}`);
+    // Send JSON object
+    return api.post('/applications/apply', {jobId: jobId, userId: userId})
 };
 export const createJob = (jobData) => {
     return api.post('/jobs', jobData);
 };
+export const getMyJobs = () => {
+    return api.get('/jobs/myJobs');
+}
+export const getMyApplication = ()=> {
+    return api.get('/applications/employer')
+}
 export const uploadCv = (userId, file) => {
     const formData = new FormData();
     // @RequestParam

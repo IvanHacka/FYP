@@ -71,6 +71,11 @@ public class UserService {
                 user.getId(),
                 user.getEmail()
         );
+
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
     }
 
 }

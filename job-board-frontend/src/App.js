@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {login, register, fetchJobs, applyJob, uploadCv, createJob, fetchApplications, getCvDownloadUrl, fetchPendingEmployers, approveEmployers} from './api/api';
+import {login, register, fetchJobs, applyJob, uploadCv, createJob, fetchApplications, getCvDownloadUrl, fetchPendingEmployers, approveEmployers, getMyJobs, getMyApplication} from './api/api';
 
 function App() {
   // localStorage.clear()
@@ -13,8 +13,8 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [role, setRole] = useState(localStorage.getItem('role') || 'EMPLOYEE');
+  const [companyName, setCompanyName] = useState('');
   const [newJob, setNewJob] = useState({title: '', description: '', location: '', salaryMin: 0});
-  const [applications, setApplications] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
   // admin
   const [pendingEmployers, setPendingEmployers] = useState([]);
@@ -27,7 +27,7 @@ function App() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await register({fullName, email, password, role});
+      await register({fullName, email, password, role, companyName: role === 'EMPLOYER'? companyName: null});
       alert("Registration Successful!");
       // go to login
       setIsLoginView(true);
@@ -71,10 +71,31 @@ function App() {
       alert("Job Posted Successfully!");
       setNewJob({ title: '', description: '', location: '', salaryMin: 0}); // Reset form
       getJobs(); // Refresh immediate
+      loadMyJobs();
     } catch (error) {
       alert("Failed to post job.");
     }
   };
+
+  const [allApplications, setAllApplications] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [myJobs, setMyJobs] = useState([]);
+  const loadMyJobs = async () => {
+    try{
+      const jobsRes = await getMyJobs();
+      setMyJobs(jobsRes.data);
+      const applicationsRes = await getMyApplication();
+      setAllApplications(applicationsRes.data);
+    }
+    catch (error){
+      console.error("Failed to load jobs dashboard");
+    }
+  };
+  useEffect(() => {
+    if(token && role === 'EMPLOYER'){
+      loadMyJobs();
+    }
+  }, [role, token]);
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
@@ -114,6 +135,9 @@ function App() {
       alert('Oops! No job found. Are you logged in?');
     }
   };
+
+
+
 
   // apply job
   const handleApply = async (jobId) => {
@@ -192,8 +216,7 @@ function App() {
                     required
                     style={{ padding: '10px' }}
                 />
-                <input
-                    type="password"
+                <input type="password"
                     placeholder="Password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -209,6 +232,15 @@ function App() {
                       <option value="EMPLOYEE">Employee</option>
                       <option value="EMPLOYER">Employer</option>
                     </select>
+                )}
+                {!isLoginView && role === 'EMPLOYER' && (
+                    <div style={{marginTop:'10px'}}>
+                      <label>Company Name: </label>
+                      <input type="text"
+                      placeholder="Google..."
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)} required/>
+                    </div>
                 )}
                 <button type="submit" style={{ padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}>
                   {isLoginView ? 'Login' : 'Register'}
@@ -236,16 +268,22 @@ function App() {
                 }} style={{background: 'red', color: 'white', border: 'none', padding: '5px 10px'}}>Logout
                 </button>
                 {role === 'EMPLOYER' && (
-                    <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#e3f2fd', borderRadius: '8px', border: '1px solid #90caf9' }}>
+                    <div style={{
+                      marginBottom: '20px',
+                      padding: '15px',
+                      backgroundColor: '#e3f2fd',
+                      borderRadius: '8px',
+                      border: '1px solid #90caf9'
+                    }}>
                       <h3>📢 Post a New Job</h3>
-                      <form onSubmit={handlePostJob} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <form onSubmit={handlePostJob} style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
 
                         <input
                             placeholder="Job Title (e.g. Java Dev)"
                             value={newJob.title}
                             onChange={e => setNewJob({...newJob, title: e.target.value})}
                             required
-                            style={{ padding: '8px' }}
+                            style={{padding: '8px'}}
                         />
 
                         <textarea
@@ -253,37 +291,130 @@ function App() {
                             value={newJob.description}
                             onChange={e => setNewJob({...newJob, description: e.target.value})}
                             required
-                            style={{ padding: '8px', minHeight: '60px' }}
+                            style={{padding: '8px', minHeight: '60px'}}
                         />
 
-                        <div style={{ display: 'flex', gap: '10px' }}>
+                        <div style={{display: 'flex', gap: '10px'}}>
                           <input
                               placeholder="Location"
                               value={newJob.location}
                               onChange={e => setNewJob({...newJob, location: e.target.value})}
-                              style={{ flex: 1, padding: '8px' }}
+                              style={{flex: 1, padding: '8px'}}
                           />
                           <input
                               type="number"
                               placeholder="Min Salary"
                               value={newJob.salaryMin}
                               onChange={e => setNewJob({...newJob, salaryMin: e.target.value})}
-                              style={{ width: '100px', padding: '8px' }}
+                              style={{width: '100px', padding: '8px'}}
                           />
                         </div>
 
-                        <button type="submit" style={{ backgroundColor: '#007bff', color: 'white', padding: '10px', border: 'none', cursor: 'pointer' }}>
+                        <button type="submit" style={{
+                          backgroundColor: '#007bff',
+                          color: 'white',
+                          padding: '10px',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}>
                           Post Job
                         </button>
                       </form>
                     </div>
                 )}
               </div>
+
+              {role === 'EMPLOYER' && (
+                  <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#e8f5e9', border: '1px solid #c8e6c9', borderRadius: '8px' }}>
+                    <h3>👥 Recent Applications (Total: {allApplications.length})</h3>
+                    {allApplications.length === 0 ? (
+                        <p>No applications received yet.</p>
+                    ) : (
+                        <ul style={{ maxHeight: '150px', overflowY: 'auto', paddingLeft: '20px' }}>
+                          {allApplications.map(app => (
+                              <li key={app.id} style={{ marginBottom: '5px' }}>
+                                <strong>{app.applicant?.fullName || 'Candidate'}</strong> applied for
+                                <strong> {app.job?.title}</strong>
+                                <span style={{ fontSize: '12px', color: '#666', marginLeft: '10px' }}>
+                            ({new Date(app.appliedAt || Date.now()).toLocaleDateString()})
+                          </span>
+                              </li>
+                          ))}
+                        </ul>
+                    )}
+                  </div>
+              )}
+
+              {role === 'EMPLOYER' && (
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '15px',
+                    border: '2px solid #007bff',
+                    borderRadius: '8px',
+                    backgroundColor: '#f0f8ff'
+                  }}>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <h3 style={{color: '#0056b3'}}>📂 My Job Posts</h3>
+                      <button onClick={loadMyJobs} style={{cursor: 'pointer', fontSize: '12px'}}>Refresh</button>
+                    </div>
+
+                    {myJobs.length === 0 ? <p>You haven't posted any jobs yet.</p> : (
+                        <ul style={{listStyle: 'none', padding: 0}}>
+                          {myJobs.map(job => (
+                              <li key={job.id} style={{
+                                background: 'white',
+                                border: '1px solid #ddd',
+                                padding: '10px',
+                                marginBottom: '10px',
+                                borderRadius: '5px'
+                              }}>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                  <div>
+                                    <strong>{job.title}</strong>
+                                    <div style={{fontSize: '12px', color: '#666'}}>
+                                      Status: <span style={{
+                                      fontWeight: 'bold',
+                                      color: job.status === 'OPEN' ? 'green' : 'red'
+                                    }}>{job.status}</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Reuse your existing handleViewApplicants logic */}
+                                  <button
+                                      onClick={() => handleViewApplicants(job.id)}
+                                      style={{
+                                        backgroundColor: '#007bff',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '5px 10px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                      }}
+                                  >
+                                    View Applicants
+                                  </button>
+                                </div>
+                              </li>
+                          ))}
+                        </ul>
+                    )}
+                  </div>
+
+
+              )}
+
               {role === 'ADMIN' && (
-                  <div style={{ padding: '20px', backgroundColor: '#fff3e0', border: '2px solid #ffb74d', borderRadius: '8px', marginBottom: '20px' }}>
-                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                      <h2 style={{ color: '#e65100', margin: 0 }}>🛡️ Admin Dashboard</h2>
-                      <button onClick={loadPendingEmployers} style={{ padding: '8px', cursor: 'pointer' }}>Refresh List</button>
+                  <div style={{
+                    padding: '20px',
+                    backgroundColor: '#fff3e0',
+                    border: '2px solid #ffb74d',
+                    borderRadius: '8px',
+                    marginBottom: '20px'
+                  }}>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <h2 style={{color: '#e65100', margin: 0}}>🛡️ Admin Dashboard</h2>
+                      <button onClick={loadPendingEmployers} style={{padding: '8px', cursor: 'pointer'}}>Refresh List
+                      </button>
                     </div>
 
                     <p>Manage pending employer registrations.</p>
@@ -291,9 +422,10 @@ function App() {
                     {pendingEmployers.length === 0 ? (
                         <p><i>No pending approvals.</i></p>
                     ) : (
-                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px', background: 'white' }}>
+                        <table
+                            style={{width: '100%', borderCollapse: 'collapse', marginTop: '10px', background: 'white'}}>
                           <thead>
-                          <tr style={{ background: '#ffcc80' }}>
+                          <tr style={{background: '#ffcc80'}}>
                             <th style={{padding: '10px', border: '1px solid #ddd'}}>ID</th>
                             <th style={{padding: '10px', border: '1px solid #ddd'}}>Email</th>
                             <th style={{padding: '10px', border: '1px solid #ddd'}}>Date Joined</th>
@@ -303,13 +435,27 @@ function App() {
                           <tbody>
                           {pendingEmployers.map(user => (
                               <tr key={user.id}>
-                                <td style={{padding: '10px', border: '1px solid #ddd', textAlign:'center'}}>{user.id}</td>
+                                <td style={{
+                                  padding: '10px',
+                                  border: '1px solid #ddd',
+                                  textAlign: 'center'
+                                }}>{user.id}</td>
                                 <td style={{padding: '10px', border: '1px solid #ddd'}}>{user.email}</td>
-                                <td style={{padding: '10px', border: '1px solid #ddd'}}>{new Date(user.createdAt).toLocaleDateString()}</td>
-                                <td style={{padding: '10px', border: '1px solid #ddd', textAlign:'center'}}>
+                                <td style={{
+                                  padding: '10px',
+                                  border: '1px solid #ddd'
+                                }}>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td style={{padding: '10px', border: '1px solid #ddd', textAlign: 'center'}}>
                                   <button
                                       onClick={() => handleApprove(user.id)}
-                                      style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer', borderRadius: '4px' }}>
+                                      style={{
+                                        backgroundColor: '#28a745',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '5px 10px',
+                                        cursor: 'pointer',
+                                        borderRadius: '4px'
+                                      }}>
                                     ✅ Approve
                                   </button>
                                 </td>
@@ -322,26 +468,26 @@ function App() {
               )}
               {/*  CV */}
               {role === 'EMPLOYEE' && (
-                <div style={{marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px'}}>
-                  <h3>My Profile</h3>
-                  <p>Upload your CV so employers can see it.</p>
+                  <div style={{marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px'}}>
+                    <h3>My Profile</h3>
+                    <p>Upload your CV so employers can see it.</p>
 
-                  <input type="file" onChange={handleFileChange}/>
+                    <input type="file" onChange={handleFileChange}/>
 
-                  <button
-                      onClick={handleUpload}
-                      style={{
-                        marginLeft: '10px',
-                        backgroundColor: '#6c757d',
-                        color: 'white',
-                        border: 'none',
-                        padding: '5px 10px',
-                        cursor: 'pointer'
-                      }}
-                  >
-                    Upload CV
-                  </button>
-                </div>
+                    <button
+                        onClick={handleUpload}
+                        style={{
+                          marginLeft: '10px',
+                          backgroundColor: '#6c757d',
+                          color: 'white',
+                          border: 'none',
+                          padding: '5px 10px',
+                          cursor: 'pointer'
+                        }}
+                    >
+                      Upload CV
+                    </button>
+                  </div>
               )}
 
               <button onClick={getJobs} style={{padding: '10px 20px', marginBottom: '20px', marginTop: '10px'}}>
@@ -369,21 +515,26 @@ function App() {
                               Apply
                             </button>
                         )}
-                        {role === 'EMPLOYER' && (
-                            <button onClick={() => handleViewApplicants(job.id)} style={{
-                              backgroundColor: '#28a745',
-                              color: 'white',
-                              border: 'none',
-                              padding: '8px 16px',
-                              borderRadius: '4px',
-                              cursor: 'pointer'
-                            }}>
-                              View Applicants
-                            </button>
-                        )}
+                        {/*{role === 'EMPLOYER' && (*/}
+                        {/*    <button onClick={() => handleViewApplicants(job.id)} style={{*/}
+                        {/*      backgroundColor: '#28a745',*/}
+                        {/*      color: 'white',*/}
+                        {/*      border: 'none',*/}
+                        {/*      padding: '8px 16px',*/}
+                        {/*      borderRadius: '4px',*/}
+                        {/*      cursor: 'pointer'*/}
+                        {/*    }}>*/}
+                        {/*      View Applicants*/}
+                        {/*    </button>*/}
+                        {/*)}*/}
                       </div>
                       {role === 'EMPLOYER' && selectedJobId === job.id && (
-                          <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#fff3cd', border: '1px solid #ffeeba' }}>
+                          <div style={{
+                            marginTop: '10px',
+                            padding: '10px',
+                            backgroundColor: '#fff3cd',
+                            border: '1px solid #ffeeba'
+                          }}>
                             <h4>Applicants for {job.title}:</h4>
                             {applications.length === 0 ? <p>No applications yet.</p> : (
                                 <ul>
@@ -392,7 +543,8 @@ function App() {
                                         {/* Note: app.employee might need to be fetched depending on your Entity JSON */}
                                         Employee ID: {app.employee?.id}
                                         {app.employee?.cv ? (
-                                            <a href={getCvDownloadUrl(app.employee.cv)} target="_blank" rel="noreferrer" style={{marginLeft: '10px', color: 'blue'}}>
+                                            <a href={getCvDownloadUrl(app.employee.cv)} target="_blank" rel="noreferrer"
+                                               style={{marginLeft: '10px', color: 'blue'}}>
                                               Download CV
                                             </a>
                                         ) : (
@@ -403,7 +555,7 @@ function App() {
                                 </ul>
                             )}
                           </div>
-                          )}
+                      )}
                     </li>
                 ))}
               </ul>

@@ -11,6 +11,7 @@ import org.example.jobboard.repo.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,10 @@ public class ApplicationService {
         Application application = Application.builder()
                 .job(job).applicant(user).matchScore(score).build();
         return applicationRepo.save(application);
+    }
+
+    public List<Application> getApplicationByCompany(Long employerId) {
+        return applicationRepo.findByApplicantId(employerId);
     }
 
 }

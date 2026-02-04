@@ -54,13 +54,16 @@ public class JobService {
         }
         return savedJob;
     }
+    public List<Job> getJobsByEmployer(Long userId){
+        return jobRepo.findByEmployerId(userId);
+    }
     public List<Job> getAllOPENJobs(){
         return jobRepo.findByStatus(Job.JobStatus.OPEN);
     }
 
     // search jobs
     public List<Job> searchJobs(String title, String location, BigDecimal salary){
-        return jobRepo.search(title, location, salary);
+        return jobRepo.search(Job.JobStatus.OPEN, title, location, salary);
     }
 
 }
