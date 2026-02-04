@@ -379,7 +379,6 @@ function App() {
                                     </div>
                                   </div>
 
-                                  {/* Reuse your existing handleViewApplicants logic */}
                                   <button
                                       onClick={() => handleViewApplicants(job.id)}
                                       style={{
@@ -540,7 +539,6 @@ function App() {
                                 <ul>
                                   {applications.map(app => (
                                       <li key={app.id}>
-                                        {/* Note: app.employee might need to be fetched depending on your Entity JSON */}
                                         Employee ID: {app.employee?.id}
                                         {app.employee?.cv ? (
                                             <a href={getCvDownloadUrl(app.employee.cv)} target="_blank" rel="noreferrer"
