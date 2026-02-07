@@ -11,7 +11,6 @@ import org.example.jobboard.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.List;
 public class ApplicationController {
     private final ApplicationService applicationService;
     private final UserService userService;
-
 //    public ApplicationController(ApplicationService applicationService) {
 //        this.applicationService = applicationService;
 //    }
@@ -40,10 +38,17 @@ public class ApplicationController {
 
     // GET
     // /api/applications/job/
-    @GetMapping("/employer/")
+    @GetMapping("/employer")
     public ResponseEntity<List<Application>> getApplicationJob(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
         User employer = userService.getUserByEmail(email);
         return ResponseEntity.ok(applicationService.getApplicationByCompany(employer.getId()));
+    }
+
+    // GET
+    // /api/applications/{jobId}
+    @GetMapping("/{jobId}")
+    public ResponseEntity<List<Application>> getApplication(@PathVariable Long jobId) {
+        return ResponseEntity.ok(applicationService.getApplicantsForJob(jobId));
     }
 }

@@ -23,7 +23,7 @@ public class ApplicationService {
 
     public Application jobApply(Long jobId, Long userId) {
 
-        if (applicationRepo.existsByApplicantIdAndJobId(jobId, userId)) {
+        if (applicationRepo.existsByApplicantIdAndJobId(userId, jobId)) {
             throw new RuntimeException(
                     "You have already applied for the job with id " + jobId);
         }
@@ -32,7 +32,7 @@ public class ApplicationService {
                 new RuntimeException("Job with id " + jobId + " not found"));
         // Find applicant
         User user = userRepo.findById(userId).orElseThrow(() ->
-                new RuntimeException("Applicant " + userId + " not found"));
+                new RuntimeException("Applicant not found"));
 
         BigDecimal score = matchingService.calculateMatchScore(jobId, userId);
         Application application = Application.builder()
@@ -41,7 +41,11 @@ public class ApplicationService {
     }
 
     public List<Application> getApplicationByCompany(Long employerId) {
-        return applicationRepo.findByApplicantId(employerId);
+        return applicationRepo.findByJobEmployerId(employerId);
+    }
+
+    public List<Application> getApplicantsForJob(Long jobId) {
+        return applicationRepo.findByJobId(jobId);
     }
 
 }

@@ -82,6 +82,8 @@ function App() {
   const [myJobs, setMyJobs] = useState([]);
   const loadMyJobs = async () => {
     try{
+      console.log("Loading Dashboard Data...");
+
       const jobsRes = await getMyJobs();
       setMyJobs(jobsRes.data);
       const applicationsRes = await getMyApplication();
@@ -167,7 +169,6 @@ function App() {
   const loadPendingEmployers = async () => {
     try {
       const response = await fetchPendingEmployers();
-      console.log("📢 ADMIN API RESPONSE:", response.data); // 👈 Check this log!
       setPendingEmployers(response.data);
     } catch (error) {
       console.error("Failed to fetch pending users", error);
@@ -229,7 +230,7 @@ function App() {
                         onChange={e => setRole(e.target.value)}
                         style={{ padding: '10px' }}
                     >
-                      <option value="EMPLOYEE">Employee</option>
+                      <option value="EMPLOYEE">Applicant</option>
                       <option value="EMPLOYER">Employer</option>
                     </select>
                 )}
@@ -332,12 +333,18 @@ function App() {
                     ) : (
                         <ul style={{ maxHeight: '150px', overflowY: 'auto', paddingLeft: '20px' }}>
                           {allApplications.map(app => (
-                              <li key={app.id} style={{ marginBottom: '5px' }}>
-                                <strong>{app.applicant?.fullName || 'Candidate'}</strong> applied for
-                                <strong> {app.job?.title}</strong>
-                                <span style={{ fontSize: '12px', color: '#666', marginLeft: '10px' }}>
-                            ({new Date(app.appliedAt || Date.now()).toLocaleDateString()})
-                          </span>
+                              <li key={app.id} style={{ marginBottom: '15px', padding: '10px', borderBottom: '2px solid' }}>
+                                <div>
+                                  <strong>{app.applicant?.fullName || 'Candidate'}</strong> applied for
+                                </div>
+                                <div>
+                                  <strong> {app.job?.title}</strong>
+                                </div>
+                                <div>
+                                  <span style={{ fontSize: '12px', color: '#666', marginLeft: '10px' }}>
+                                    ({new Date(app.appliedAt || Date.now()).toLocaleDateString()})
+                                  </span>
+                                </div>
                               </li>
                           ))}
                         </ul>
@@ -393,6 +400,37 @@ function App() {
                                     View Applicants
                                   </button>
                                 </div>
+                                {selectedJobId === job.id && (
+                                    <div style={{
+                                      marginTop: '10px',
+                                      padding: '10px',
+                                      backgroundColor: '#9f9f9f',
+                                      border: '1px solid'
+                                    }}>
+                                      <h4>Applicants for {job.title}:</h4>
+                                      {applications.length === 0 ? <p>No applications yet.</p> : (
+                                          <ul>
+                                            {applications.map(app => (
+                                                <li key={app.id} style={{marginBottom: '10px', borderBottom: '1px solid', paddingBottom: '10px'}}>
+                                                  <div>
+                                                    <strong>Full Name:</strong> {app.applicant?.fullName}
+                                                  </div>
+                                                  <div>
+                                                    {app.applicant?.cv? (
+                                                        <a href={getCvDownloadUrl(app.applicant.cv)} target="_blank" rel="noreferrer"
+                                                           style={{marginLeft: '10px', color: 'blue'}}>
+                                                          Download CV
+                                                        </a>
+                                                    ) : (
+                                                        <span style={{marginLeft: '10px', color: 'red'}}>No CV</span>
+                                                    )}
+                                                  </div>
+                                                </li>
+                                            ))}
+                                          </ul>
+                                      )}
+                                    </div>
+                                )}
                               </li>
                           ))}
                         </ul>
@@ -527,33 +565,7 @@ function App() {
                         {/*    </button>*/}
                         {/*)}*/}
                       </div>
-                      {role === 'EMPLOYER' && selectedJobId === job.id && (
-                          <div style={{
-                            marginTop: '10px',
-                            padding: '10px',
-                            backgroundColor: '#fff3cd',
-                            border: '1px solid #ffeeba'
-                          }}>
-                            <h4>Applicants for {job.title}:</h4>
-                            {applications.length === 0 ? <p>No applications yet.</p> : (
-                                <ul>
-                                  {applications.map(app => (
-                                      <li key={app.id}>
-                                        Employee ID: {app.employee?.id}
-                                        {app.employee?.cv ? (
-                                            <a href={getCvDownloadUrl(app.employee.cv)} target="_blank" rel="noreferrer"
-                                               style={{marginLeft: '10px', color: 'blue'}}>
-                                              Download CV
-                                            </a>
-                                        ) : (
-                                            <span style={{marginLeft: '10px', color: 'red'}}>No CV</span>
-                                        )}
-                                      </li>
-                                  ))}
-                                </ul>
-                            )}
-                          </div>
-                      )}
+
                     </li>
                 ))}
               </ul>

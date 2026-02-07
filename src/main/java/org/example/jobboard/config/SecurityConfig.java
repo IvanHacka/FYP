@@ -25,9 +25,6 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthConfig jwtAuthConfig, AuthenticationProvider authenticationProvider) {
         this.jwtAuthConfig = jwtAuthConfig;
         this.authenticationProvider = authenticationProvider;
-        System.out.println("============================================");
-        System.out.println("🚨 SECURITY CONFIG IS LOADING... 🚨");
-        System.out.println("============================================");
     }
 
 

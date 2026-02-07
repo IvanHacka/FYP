@@ -9,12 +9,6 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
     // browser cache
     const token = localStorage.getItem('token');
-    console.log("📢 SENDING TOKEN:", token);
-    if (token) {
-        console.log("🚀 SENDING TOKEN starting with:", token.substring(0, 15) + "...");
-    } else {
-        console.log("⚠️ NO TOKEN FOUND in LocalStorage");
-    }
     if(token){
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,7 +28,7 @@ export const fetchJobs = (filters = {}) => {
     return api.get(`/jobs/search?${params}`);
 };
 export const fetchApplications = (jobId) => {
-    return api.get(`/applications/job/${jobId}`);
+    return api.get(`/applications/${jobId}`);
 };
 export const applyJob = (jobId, userId) => {
     // return api.post(`/applications/apply?jobId=${jobId}&employeeId=${employeeId}`);

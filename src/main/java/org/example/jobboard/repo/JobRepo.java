@@ -12,7 +12,6 @@ import java.util.List;
 public interface JobRepo extends JpaRepository<Job, Long>{
     List<Job> findByStatus(Job.JobStatus status); // example -> get all OPEN
     List<Job> findByEmployerId(Long id); // Get job posted by the employer
-    List<Job> findByEmployer(User employer);
 
     // search feature with SQL Query
     // status = "OPEN"
