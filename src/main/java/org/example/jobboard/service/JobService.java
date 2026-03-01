@@ -62,8 +62,15 @@ public class JobService {
     }
 
     // search jobs
-    public List<Job> searchJobs(String title, String location, BigDecimal salary){
-        return jobRepo.search(Job.JobStatus.OPEN, title, location, salary);
+    public List<Job> searchJobs(String title, String location, BigDecimal minSalary){
+        String titleParam = (title != null && !title.trim().isEmpty()) ? title.trim() : null;
+        String locationParam = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
+        BigDecimal salaryParam = (minSalary != null && minSalary.compareTo(BigDecimal.ZERO) > 0) ? minSalary : null;
+        return jobRepo.search(Job.JobStatus.OPEN, titleParam, locationParam, salaryParam);
+    }
+
+    public Job getJobById(Long id){
+        return jobRepo.findById(id).orElseThrow(() -> new RuntimeException("Job not found"));
     }
 
 }

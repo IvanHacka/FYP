@@ -59,9 +59,9 @@ public class JobController {
     @GetMapping("/search")
     public ResponseEntity<List<Job>> searchJobs(@RequestParam(required = false) String title,
                                                 @RequestParam(required = false) String location,
-                                                @RequestParam(required = false) BigDecimal salary)
+                                                @RequestParam(required = false) BigDecimal minSalary)
     {
-        return ResponseEntity.ok(jobService.searchJobs(title, location, salary));
+        return ResponseEntity.ok(jobService.searchJobs(title, location, minSalary));
     }
 
     // GET
