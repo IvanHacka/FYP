@@ -11,6 +11,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -44,15 +46,54 @@ public class Job {
     private String location;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private JobStatus status;
 
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+
+    // 2 column
+    // a list of skills
+    // job id to indicate which job requires what skills
+    @ElementCollection
+    @CollectionTable(name = "job_required_skills", joinColumns = @JoinColumn(name = "job_id"))
+    @Column(name = "skill_name")
+    private List<String> requiredSkills = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "experience_level")
+    private ExperienceLevel experienceLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "job_type", length = 50)
+    private JobType jobType;
 
     public enum JobStatus {
         OPEN,
         CLOSE
+    }
+
+    // Years of experience
+    // Entry = 0-1
+    // Junior = 1-3
+    // MID = 3-5
+    // Senior = 5-10
+    public enum ExperienceLevel {
+        ENTRY,
+        JUNIOR,
+        MID,
+        SENIOR
+
+    }
+    public enum JobType {
+        FULL_TIME,
+        PART_TIME,
+        CONTRACT,
+        INTERNSHIP,
+        REMOTE
+
     }
 }
 

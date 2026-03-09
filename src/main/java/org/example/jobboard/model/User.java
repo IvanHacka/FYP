@@ -13,10 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -28,16 +25,6 @@ public class User implements UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-
-//    @NotBlank(message = "First name is required")
-//    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-//    @Column(name = "first_name", nullable = false, length = 50)
-//    private String firstName;
-//
-//    @NotBlank(message = "Last name is required")
-//    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
-//    @Column(name = "last_name", nullable = false, length = 50)
-//    private String lastName;
 
     @Column(name = "full_name", nullable = false, length = 50)
     private String fullName;
@@ -77,6 +64,38 @@ public class User implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    @Column(length = 20)
+    private String phone;
+
+    @Column(name = "linkedin_url")
+    private String linkedinUrl;
+
+    @Column(name = "portfolio_url")
+    private String portfolioUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
+
+    // might calculate percentage
+    @Column(name = "profile_complete")
+    private Boolean profileComplete = false;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<Experience> experiences = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Education> education = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<Certificate> certificates = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Document> documents = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Preference jobPreferences;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_skills",
@@ -86,6 +105,36 @@ public class User implements UserDetails {
     private Set<Skill> skills = new HashSet<>();
 
 
+    // get latest cv
+    public Document getCurrentCv(){
+        if (documents == null || documents.isEmpty()){
+            return null;
+        }
+        return documents.stream().filter(doc -> doc.getDocumentType() == Document.DocumentType.CV)
+                .max((doc1, doc2) -> doc1.getUploadedAt().compareTo(doc2.getUploadedAt()))
+                .orElse(null); // null if no cv
+    }
+
+    // get latest cover letter
+    public Document getCurrentCoverLetter(){
+        if (documents == null || documents.isEmpty()){
+            return null;
+        }
+        return documents.stream().filter(doc -> doc.getDocumentType() == Document.DocumentType.COVER_LETTER)
+                .max((doc1, doc2) -> doc1.getUploadedAt().compareTo(doc2.getUploadedAt()))
+                .orElse(null); // null if no cover letter
+    }
+
+    // check if user has cv
+    public boolean hasCv(){
+        if (documents == null || documents.isEmpty()){
+            return false;
+        }
+        return documents.stream().anyMatch(doc -> doc.getDocumentType() == Document.DocumentType.CV);
+    }
+
+
+    // Revise
     // add to match Userdetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

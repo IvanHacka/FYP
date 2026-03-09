@@ -29,6 +29,12 @@ public class EmployeeSkill {
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
 
+    // 1 = Beginner, 2 = Intermediate, 3 = advanced, 4 = expert
     @Column(name = "proficiency_level")
     private Integer proficiencyLevel;
+
+
+    // might need this for AI matching
+    @Column(name = "years_of_experience")
+    private Integer yearsOfExperience = 0;
 }

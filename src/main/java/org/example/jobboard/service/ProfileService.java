@@ -1,0 +1,85 @@
+package org.example.jobboard.service;
+
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.example.jobboard.dto.ExperienceRequest;
+import org.example.jobboard.model.Experience;
+import org.example.jobboard.model.User;
+import org.example.jobboard.repo.ExperienceRepo;
+import org.example.jobboard.repo.UserRepo;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ProfileService {
+
+    private final UserRepo userRepo;
+    private final ExperienceRepo experienceRepo;
+
+    // add new experience
+    @Transactional
+    public Experience addExperience(ExperienceRequest request, Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Experience experience = Experience.builder()
+                .user(user)
+                .companyName(request.getCompanyName())
+                .jobTitle(request.getJobTitle())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .isCurrent(request.getIsCurrent() != null ? request.getIsCurrent() : false)
+                .description(request.getDescription())
+                .build();
+
+        return experienceRepo.save(experience);
+    }
+
+    @Transactional
+    public Experience updateExperience(ExperienceRequest request, Long userId, Long experienceId) {
+        Experience experience = experienceRepo.findById(experienceId)
+                .orElseThrow(() -> new RuntimeException("Experience not found"));
+
+
+        // make sure user can only change if they have the experience
+        // (Cant change others experience)
+        if (!experience.getUser().getId().equals(userId)) {
+            throw new RuntimeException("User not have this experience");
+        }
+
+        experience.setCompanyName(request.getCompanyName());
+        experience.setJobTitle(request.getJobTitle());
+        experience.setStartDate(request.getStartDate());
+        experience.setEndDate(request.getEndDate());
+        experience.setIsCurrent(request.getIsCurrent() != null ? request.getIsCurrent() : false);
+        experience.setDescription(request.getDescription());
+        return experienceRepo.save(experience);
+    }
+
+    @Transactional
+    public void deleteExperience(Long userId, Long experienceId) {
+        Experience experience = experienceRepo.findById(experienceId)
+                .orElseThrow(() -> new RuntimeException("Experience not found"));
+
+        if (!experience.getUser().getId().equals(userId)) {
+            throw new RuntimeException("User not have this experience");
+        }
+
+        experienceRepo.delete(experience);
+    }
+
+    // Get all experience for the user
+    // Match findByUserId
+    public List<Experience> getUserExperiences(Long userId) {
+        return experienceRepo.findByUserIdOrderByStartDateDesc(userId);
+    }
+
+    // Get one experience
+    public Experience getExperience(Long experienceId) {
+        return experienceRepo.findById(experienceId)
+            .orElseThrow(() -> new RuntimeException("Experience not found"));
+    }
+}

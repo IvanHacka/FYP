@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -37,4 +38,41 @@ public class Application {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String coverLetter;
+
+    @ManyToOne
+    @JoinColumn(name = "cover_letter_document_id")
+    private Document coverLetterDocument;
+
+    @Column(name = "expected_salary")
+    private BigDecimal expectedSalary;
+
+    @Column(name = "available_start_date")
+    private LocalDate availableStartDate;
+
+
+    // A question I usually get asked
+    @Column(name = "why_good_fit", columnDefinition = "TEXT")
+    private String whyGoodFit;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private ApplicationStatus status = ApplicationStatus.PENDING;
+
+    @Column(name = "employer_notes", columnDefinition = "TEXT")
+    private String employerNotes;
+
+    @Column(name = "reviewed_at")
+    private LocalDateTime reviewedAt;
+
+    // might send a form or a invitation if shortlisted ?
+    public enum ApplicationStatus {
+        PENDING,
+        REVIEWED,
+        SHORTLISTED,
+        REJECTED,
+        ACCEPTED
+    }
 }

@@ -16,34 +16,37 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "experiences")
-public class Experience {
+@Table(name = "ceritficates")
+public class Certificate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "experience_id")
+    @Column(name = "certificate_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "company_name", nullable = false)
-    private String companyName;
+    @Column(name = "certificate_name", nullable = false)
+    private String certificateName;
 
-    @Column(name = "job_title", nullable = false)
-    private String jobTitle;
+    @Column(name = "issuing_organization", nullable = false)
+    private String issuingOrganization;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    @Column(name = "issue_date", nullable = false)
+    private LocalDate issueDate;
 
-    @Column(name = "end_date")
-    private LocalDate endDate;
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
 
-    @Column(name = "is_current")
-    private Boolean isCurrent = false;
+    @Column(name = "credential_id")
+    private String credentialId;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "credential_url")
+    private String credentialUrl;
+
+    @Column(name = "certificate_file")
+    private String certificateFile;
 
     @CreationTimestamp
     @Column(name = "created_at")

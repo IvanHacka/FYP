@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.EmployeeProfileRequest;
 import org.example.jobboard.dto.EmployeeSkillRequest;
-import org.example.jobboard.dto.SkillRequest;
 import org.example.jobboard.model.EmployeeSkill;
 import org.example.jobboard.model.Skill;
 import org.example.jobboard.model.User;
@@ -14,7 +13,9 @@ import org.example.jobboard.repo.SkillRepo;
 import org.example.jobboard.repo.UserRepo;
 import org.example.jobboard.util.FileStorageUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,6 @@ public class EmployeeService {
     private final UserRepo userRepo;
     private final SkillRepo skillRepo;
     private final EmployeeSkillRepo employeeSkillRepo;
-    private final FileStorageUtil fileStorageUtil;
 
 
     // Profile and skills save together
@@ -46,41 +46,111 @@ public class EmployeeService {
                 Skill skill = skillRepo.findById(req.getSkillId()).orElseThrow(
                         () -> new RuntimeException("Skill not found"));
 
-                EmployeeSkill employeeSkill = EmployeeSkill.builder()
-                        .user(savedUser)
-                        .skill(skill)
-                        .proficiencyLevel(req.getProficiencyLevel())
-                        .build();
+                Optional<EmployeeSkill> existedSkill = employeeSkillRepo
+                        .findByUserIdAndSkillId(savedUser.getId(), req.getSkillId());
 
-                employeeSkillRepo.save(employeeSkill);
+                // update if exist
+                if(existedSkill.isPresent()){
+                    EmployeeSkill employeeSkill = existedSkill.get();
+                    employeeSkill.setProficiencyLevel(req.getProficiencyLevel());
+                    employeeSkillRepo.save(employeeSkill);
+                }
+                else{
+                    EmployeeSkill employeeSkill = EmployeeSkill.builder()
+                            .user(savedUser)
+                            .skill(skill)
+                            .proficiencyLevel(req.getProficiencyLevel())
+                            .build();
+                    employeeSkillRepo.save(employeeSkill);
+                }
+
+
             }
         }
         return savedUser;
     }
 
-    // CV upload with FileStorageUtil
-    public User cvUpload(Long employeeId, MultipartFile file) {
-        try{
-            String fileName = fileStorageUtil.saveFile(file);
-            User user = userRepo.findById(employeeId).orElseThrow
-                    (() -> new RuntimeException("Employee not found"));
-            user.setCv(fileName);
-            return userRepo.save(user);
+    public List<EmployeeSkill> getUserSkills(Long userId){
+        return employeeSkillRepo.findByUserId(userId);
+    }
+    public EmployeeSkill addSkill(Long userId, Long skillId, int proficiency) {
+        Optional<EmployeeSkill> existSkill = employeeSkillRepo.findByUserIdAndSkillId(userId, skillId);
+        if(existSkill.isPresent()) {
+            throw new RuntimeException("Skill already exists");
         }
-        catch (Exception e) {
-            throw new RuntimeException("Having trouble saving file. Error: ", e);
-        }
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Skill skill = skillRepo.findById(skillId).orElseThrow(() -> new RuntimeException("Skill not found"));
+
+        EmployeeSkill employeeSkill = EmployeeSkill.builder().user(user).skill(skill)
+                .proficiencyLevel(proficiency)
+                .build();
+
+        return employeeSkillRepo.save(employeeSkill);
     }
 
-    public void addSkill(Long userId, Long skillId, int proficiency) {
-        User user = userRepo.findById(userId).orElseThrow();
-        Skill skill = skillRepo.findById(skillId).orElseThrow();
+    public void deleteSkill(Long userId, Long skillId) {
+        EmployeeSkill employeeSkill = employeeSkillRepo.findByUserIdAndSkillId(userId, skillId).orElseThrow(() ->
+                new RuntimeException("Skill not found"));
 
-        EmployeeSkill employeeSkill = new EmployeeSkill();
-        employeeSkill.setUser(user); // Updated to setUser (was setEmployee)
-        employeeSkill.setSkill(skill);
+        employeeSkillRepo.delete(employeeSkill);
+    }
+
+    public EmployeeSkill updateSkillProficiency(Long userId, Long skillId, int proficiency) {
+        EmployeeSkill employeeSkill = employeeSkillRepo.findByUserIdAndSkillId(userId, skillId)
+                .orElseThrow(() -> new RuntimeException("Skill not found with this user id: " + userId));
         employeeSkill.setProficiencyLevel(proficiency);
-
-        employeeSkillRepo.save(employeeSkill);
+        return employeeSkillRepo.save(employeeSkill);
     }
+
+    // calculate completion of profile setup
+    public int profileCompletion(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        int score = 0;
+        int maxScore = 100;
+
+        if(user.getFullName() != null && !user.getFullName().isEmpty()) {
+            score += 10;
+        }
+        if(user.getBio() != null && !user.getBio().isEmpty()) {
+            score += 10;
+        }
+        if(user.getPhone() != null && !user.getPhone().isEmpty()) {
+            score += 5;
+        }
+        if(user.getEmail() != null && !user.getEmail().isEmpty()) {
+            score += 5;
+        }
+        if(user.getAddress() != null && !user.getAddress().isEmpty()) {
+            score += 10;
+        }
+
+        List<EmployeeSkill> skills = employeeSkillRepo.findByUserId(userId);
+        if(skills.size() > 5) {
+            score += 20;
+        }
+        else{
+            score += skills.size() * 4;
+        }
+
+        if(user.hasCv()){
+            score += 20;
+        }
+
+        if(!user.getExperiences().isEmpty()){
+            score += 10;
+        }
+        if(!user.getEducation().isEmpty()){
+            score += 10;
+        }
+
+        return score;
+    }
+
+    // Count skills user has
+    public Long countSkill(Long userId){
+        return employeeSkillRepo.countByUserId(userId);
+    }
+
+
 }

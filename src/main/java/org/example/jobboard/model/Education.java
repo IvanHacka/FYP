@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,34 +15,30 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "experiences")
-public class Experience {
+@Table(name = "educations")
+public class Education {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "experience_id")
+    @Column(name = "education_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "company_name", nullable = false)
-    private String companyName;
+    @Column(nullable = false)
+    private String institution;
 
-    @Column(name = "job_title", nullable = false)
-    private String jobTitle;
+    @Column(nullable = false)
+    private String degree;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    @Column(name = "field_of_study")
+    private String fieldOfStudy;
 
-    @Column(name = "end_date")
-    private LocalDate endDate;
+    @Column(name = "graduation_year")
+    private Integer graduationYear;
 
-    @Column(name = "is_current")
-    private Boolean isCurrent = false;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    private String grade;
 
     @CreationTimestamp
     @Column(name = "created_at")
