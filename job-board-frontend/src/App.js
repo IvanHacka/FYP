@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
 // import {login, register, fetchJobs, applyJob, uploadCv, createJob, fetchApplications, getCvDownloadUrl, fetchPendingEmployers, approveEmployers, getMyJobs, getMyApplication} from './api/api';
-import {Routes, Route, Navigate, useLocation, useNavigate} from "react-router-dom";
+import {Link, Routes, Route, Navigate, useLocation, useNavigate} from "react-router-dom";
+import ProfilePage from "./Profile";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 
@@ -588,6 +589,7 @@ function App() {
                 <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
                   <span>Welcome, <strong>{username}</strong></span>
                   {role === 'ADMIN' && <span className={"admin-btn"}>Admin login</span>}
+                  <Link to="/profile">My Profile</Link>
                   <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
                 </div>
             )}
@@ -599,6 +601,7 @@ function App() {
           <Routes>
             <Route path={"/login"} element={!token? <Login/> : <Navigate to = "/dashboard"/>}></Route>
             <Route path={"/dashboard"} element={token? <Dashboard role={role} userId={userId} token={token}/> : <Navigate to = "/login"/>}></Route>
+            <Route path={"/profile"} element={token? <ProfilePage role={role}/> : <Navigate to="/login"/>}></Route>
             <Route path={"*"} element={<Navigate to={token? "/dashboard" : "/login"}/>}></Route>
           </Routes>
         </div>

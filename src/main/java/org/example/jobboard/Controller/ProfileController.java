@@ -3,6 +3,7 @@ package org.example.jobboard.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.ExperienceRequest;
+import org.example.jobboard.dto.ProfileUpdateRequest;
 import org.example.jobboard.model.*;
 import org.example.jobboard.repo.DocumentRepo;
 import org.example.jobboard.service.ProfileService;
@@ -31,6 +32,45 @@ public class ProfileController {
     private final UserService userService;
     private final FileStorageUtil fileStorageUtil;
     private final DocumentRepo documentRepo;
+
+    // Basic set up
+    // GET api/profile/me
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentProfile(
+            @AuthenticationPrincipal UserDetails userDetails
+    ){
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(user);
+    }
+
+    // PUT api/profile/update
+    @PutMapping("/update")
+    public ResponseEntity<User> updateProfile(
+            @RequestBody ProfileUpdateRequest req,
+            @AuthenticationPrincipal UserDetails userDetails
+    ){
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        if (req.getFullName() != null){
+            user.setFullName(req.getFullName());
+        }
+        if(req.getBio() != null){
+            user.setBio(req.getBio());
+        }
+        if(req.getPhone() != null){
+            user.setPhone(req.getPhone());
+        }
+        if(req.getAddress() != null){
+            user.setAddress(req.getAddress());
+        }
+        if(req.getPortfolioUrl() != null){
+            user.setPortfolioUrl(req.getPortfolioUrl());
+        }
+        if(req.getLinkedInUrl() != null){
+            user.setLinkedinUrl(req.getLinkedInUrl());
+        }
+        User updated = userService.saveUser(user);
+        return ResponseEntity.ok(updated);
+    }
 
     // All experience for current user
     // GET api/profile/experiences
@@ -139,7 +179,7 @@ public class ProfileController {
         if (!document.getUser().getId().equals(user.getId())) {
             return ResponseEntity.notFound().build();
         }
-        Resource resource = fileStorageUtil.loadFileAsResource(document.getFilePath());
+        Resource resource = fileStorageUtil.loadFileAsResource(".."+document.getFilePath());
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 // two possible value: inline or attachment
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""

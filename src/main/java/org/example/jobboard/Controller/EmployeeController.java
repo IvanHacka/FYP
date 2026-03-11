@@ -28,12 +28,12 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final UserService userService;
 
-    // POST
-    // api/employees/profile
-    @PostMapping("/profile")
-    ResponseEntity<User> createProfile(@RequestBody EmployeeProfileRequest employeeProfileRequest, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(employeeService.createProfile(employeeProfileRequest, userDetails.getUsername()));
-    }
+//    // POST
+//    // api/employees/profile
+//    @PostMapping("/profile")
+//    ResponseEntity<User> createProfile(@RequestBody EmployeeProfileRequest employeeProfileRequest, @AuthenticationPrincipal UserDetails userDetails) {
+//        return ResponseEntity.ok(employeeService.createProfile(employeeProfileRequest, userDetails.getUsername()));
+//    }
 
 
     // GET

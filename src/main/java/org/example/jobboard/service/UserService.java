@@ -78,4 +78,8 @@ public class UserService {
         return userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
     }
 
+    public User saveUser(User user) {
+        return userRepo.save(user);
+    }
+
 }

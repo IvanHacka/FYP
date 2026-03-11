@@ -13,7 +13,10 @@ api.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-});
+},
+    //
+    (error) => Promise.reject(error)
+);
 
 // api
 // AUTH
@@ -24,7 +27,94 @@ export const login = (email, password) => {
     return api.post('/auth/login', {email, password});
 };
 
+// Profile
+
+export const getProfileCompletion = () =>{
+    return api.get('/employees/profile/completion');
+}
+
+export const getProfile = () => {
+    return api.get('/profile/me');
+};
+
+export const updateProfile = (profileData) => {
+    return api.put('/profile/update', profileData);
+};
+
+export const getExperiences = () => {
+    return api.get('/profile/experiences');
+};
+
+export const addExperience = (experienceData) => {
+    return api.post('/profile/experiences', experienceData);
+};
+
+export const updateExperience = (id, experienceData) => {
+    return api.put(`/profile/experiences/${id}`, experienceData);
+};
+
+export const deleteExperience = (id) => {
+    return api.delete(`/profile/experience/${id}`);
+};
+
+// Documents
+
+export const getDocuments = () => {
+    return api.get('/profile/documents');
+}
+
+export const uploadDocument = (file, documentType) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+
+    return api.post('/profile/documents',
+        formData,
+        {headers: {'Content-Type': "multipart/form-data"},
+        });
+};
+
+export const downloadDocument = (documentId) => {
+    return api.get(`/profile/documents/download/${documentId}`,
+        {responseType: 'blob'}); // important
+};
+
+export const deleteDocument = (documentId) => {
+    return api.delete(`/profile/documents/${documentId}`);
+};
+
+export const hasCv = () => {
+    return api.get('/profile/hasCv');
+}
+
+// Skills
+
+export const getSkills = () => {
+    return api.get('/employees/skills');
+}
+
+export const addSkill = (skillData) => {
+    return api.post('/employees/skills', skillData);
+}
+
+export const updateSkillProficiency = (skillId, proficiencyLevel) => {
+    return api.put(`/employees/skills/${skillId}`, {proficiencyLevel}); // {} as json expected
+}
+
+export const deleteSkill = (skillId) => {
+    return api.delete(`/employees/skills/${skillId}`);
+}
+
+export const getSkillCount = () => {
+    return api.get('/employees/skills/count');
+}
+
+export const getSkillList = () => {
+    return api.get('/skills');
+}
+
 // Job
+
 export const fetchJobs = () => {
     return api.get(`/jobs`);
 };
