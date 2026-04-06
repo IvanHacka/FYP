@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDocuments, uploadDocument, downloadDocument,
     deleteDocument } from "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/api/api.js";
-import '/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/Profile/ProfileStyle.css';
+import '/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/components/profile/ProfileStyle.css';
 
 const DocumentsSection = ({ onUpdate }) => {
     const [documents, setDocuments] = useState([]);
@@ -325,6 +325,17 @@ const DocumentsSection = ({ onUpdate }) => {
                         ))}
                     </div>
                 )}
+            </div>
+            <div className="upload-tips">
+                <h4>Tips for your documents:</h4>
+                <ul>
+                    <li>Use PDF format for best compatibility and professional appearance</li>
+                    <li>Keep file size under 5MB for faster uploads and downloads</li>
+                    <li>Include relevant work experience and skills in your CV</li>
+                    <li>Make sure contact information is up to date</li>
+                    <li>Use clear, descriptive file names (e.g., "John_Doe_CV_2026.pdf")</li>
+                    <li>Tailor your cover letter to each job application</li>
+                </ul>
             </div>
         </div>
     );

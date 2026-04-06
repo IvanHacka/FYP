@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getProfileCompletion } from "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/api/api.js";
-import ProfileCompletion from './Profile/ProfileCompletion';
-import ExperienceSection from './Profile/ExperienceSection';
-import DocumentsSection from './Profile/DocumentSection';
-import SkillsSection from './Profile/SkillsSection';
-import './Profile/ProfileStyle.css';
-import BasicInfoSection from "./Profile/BasicInfoSection";
+import ProfileCompletion from './ProfileCompletion';
+import ExperienceSection from './ExperienceSection';
+import DocumentsSection from './DocumentSection';
+import SkillsSection from './SkillsSection';
+import './ProfileStyle.css';
+import BasicInfoSection from "./BasicInfoSection";
 
 function ProfilePage({role}) {
     const [activeTab, setActiveTab] = useState('basic');

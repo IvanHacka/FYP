@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 public class MatchingService {
 
     private final JobSkillRepo jobSkillRepo;
-    private final EmployeeSkillRepo employeeskillRepo;
+    private final EmployeeSkillRepo employeeSkillRepo;
 
     public BigDecimal calculateMatchScore(Long jobId, Long userId){
         List<JobSkill> jobSkills = jobSkillRepo.findByJobId(jobId);
-        List<EmployeeSkill> employeeSkills = employeeskillRepo.findByUserId(userId);
+        List<EmployeeSkill> employeeSkills = employeeSkillRepo.findByUserId(userId);
 
         if (jobSkills.isEmpty()){
             return BigDecimal.valueOf(100.00);

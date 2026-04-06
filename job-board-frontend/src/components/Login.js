@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from 'react-router-dom';
-import {login, register} from './api/api';
+import {login, register} from '../api/api';
 
 function Login(){
     const [isLoginView, setIsLoginView] = useState(true);
@@ -33,6 +33,14 @@ function Login(){
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('username', data.username);
             localStorage.setItem('role', data.role);
+            const user = {
+                id: data.userId,
+                email: data.username,
+                fullName: data.fullName,
+                role: data.role
+            };
+            localStorage.setItem('user', JSON.stringify(user));
+
 
             alert(`Welcome back! ${data.username}`);
             navigate('/dashboard'); // Go to dashboard

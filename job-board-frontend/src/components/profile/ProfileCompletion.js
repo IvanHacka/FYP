@@ -1,5 +1,5 @@
 import React from 'react';
-import "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/Profile/ProfileStyle.css";
+import "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/components/profile/ProfileStyle.css";
 
 const ProfileCompletion = ({ percentage }) => {
     const getCompletionMessage = () => {

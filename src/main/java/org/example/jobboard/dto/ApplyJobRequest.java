@@ -4,7 +4,7 @@ package org.example.jobboard.dto;
 import lombok.Data;
 
 @Data
-public class ApplicationRequest {
+public class ApplyJobRequest {
     private Long jobId;
-    private Long userId;
+    private String whyGoodFit;
 }

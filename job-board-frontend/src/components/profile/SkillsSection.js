@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getSkills, addSkill, updateSkillProficiency, deleteSkill,
     getSkillList } from "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/api/api.js";
-import '/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/Profile/ProfileStyle.css';
+import '/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/components/profile/ProfileStyle.css';
 
 const SkillsSection = ({ onUpdate }) => {
     const [skills, setSkills] = useState([]);
