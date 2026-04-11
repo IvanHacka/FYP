@@ -5,13 +5,19 @@ import org.example.jobboard.model.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicationRepo extends JpaRepository<Application, Long>{
-    List<Application> findByJobId(Long id);
     // Find who apply to the job
+    List<Application> findByJobIdOrderByCreatedAtDesc(Long employerId);
 
-    List<Application> findByApplicantId(Long id);
-    // Find what jobs the applicant applied to
+    // Find applications history
+    List<Application> findByApplicantIdOrderByCreatedAtDesc(Long applicantId);
+
+    Optional<Application> findByIdAndApplicantId(Long applicationId, Long applicantId);
+
+    Optional<Application> findByIdAndJobEmployerId(Long applicationId, Long employerId);
+
 
     List<Application> findByJobEmployerId(Long id);
     // Find the applicants who match employer id with the job

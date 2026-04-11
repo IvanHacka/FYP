@@ -121,10 +121,14 @@ export const fetchJobs = () => {
 export const fetchApplications = (jobId) => {
     return api.get(`/applications/${jobId}`);
 };
-export const applyJob = (jobId, userId) => {
-    // Send JSON object
-    return api.post('/applications/apply', {jobId: jobId, userId: userId})
+// export const applyJob = (jobId, userId) => {
+//     // Send JSON object
+//     return api.post('/applications/apply', {jobId: jobId, userId: userId})
+// };
+export const applyJob = (jobId, whyGoodFit = '') => {
+    return api.post('/applications/apply', {jobId, whyGoodFit});
 };
+
 export const createJob = (jobData) => {
     return api.post('/jobs', jobData);
 };
@@ -146,10 +150,34 @@ export const searchJobs = (filters = {}) => {
     return api.get(`/jobs/search?${params.toString()}`)
 }
 
+export const getWatchList = () => {
+    return api.get('/watchList');
+};
+
+export const saveJob = (jobId) => {
+    return api.post(`/watchList/${jobId}`);
+};
+
+export const removeSavedJob = (jobId) => {
+    return api.delete(`/watchList/${jobId}`);
+};
+
 // Application
-export const getMyApplication = ()=> {
+export const getEmployerApplications = ()=> {
     return api.get('/applications/employer')
 }
+export const getEmployeeApplications = () => {
+    return api.get('/applications/employee')
+}
+
+export const updateApplicationStatus = (applicationId, status, employerNotes = '') => {
+    return api.put(`/applications/${applicationId}/status`, {status,employerNotes});
+};
+
+export const withdrawApplication = (applicationId) => {
+    return api.put(`/applications/${applicationId}/withdraw`);
+};
+
 export const uploadCv = (userId, file) => {
     const formData = new FormData();
     // match @RequestParam
@@ -173,6 +201,26 @@ export const fetchPendingEmployers = () => {
 };
 export const approveEmployers = (userId) => {
     return api.put(`/admin/approveEmployers/${userId}`);
+};
+
+
+export const getAllUsers = () => {
+    return api.get('/admin/users');
+};
+
+
+export const getInactiveUsers = () => {
+    return api.get('/admin/inactive-users');
+};
+
+// Ban user
+export const banUser = (userId) => {
+    return api.put(`/admin/users/${userId}/ban`);
+};
+
+// Reactive a banned user
+export const reactivateUser = (userId) => {
+    return api.put(`/admin/users/${userId}/reactivate`);
 };
 
 export default api;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getProfileCompletion } from "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/api/api.js";
+import React, {useState, useEffect} from 'react';
+import {getProfileCompletion} from "../../api/api.js";
 import ProfileCompletion from './ProfileCompletion';
 import ExperienceSection from './ExperienceSection';
 import DocumentsSection from './DocumentSection';

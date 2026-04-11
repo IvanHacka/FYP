@@ -72,7 +72,8 @@ public class Job {
 
     public enum JobStatus {
         OPEN,
-        CLOSE
+        CLOSED,
+        EXPIRED,
     }
 
     // Years of experience

@@ -28,7 +28,7 @@ public class Application {
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User applicant;
 
@@ -42,7 +42,7 @@ public class Application {
     @Column(columnDefinition = "TEXT")
     private String coverLetter;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cover_letter_document_id")
     private Document coverLetterDocument;
 
@@ -59,7 +59,7 @@ public class Application {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private ApplicationStatus status = ApplicationStatus.PENDING;
+    private ApplicationStatus status = ApplicationStatus.SUBMITTED;
 
     @Column(name = "employer_notes", columnDefinition = "TEXT")
     private String employerNotes;
@@ -69,10 +69,11 @@ public class Application {
 
     // might send a form or a invitation if shortlisted ?
     public enum ApplicationStatus {
-        PENDING,
-        REVIEWED,
+        SUBMITTED,
+        UNDER_REVIEWED,
         SHORTLISTED,
         REJECTED,
-        ACCEPTED
+        ACCEPTED,
+        WITHDRAWN,
     }
 }

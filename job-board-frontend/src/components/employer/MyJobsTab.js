@@ -77,7 +77,7 @@ function MyJobsTab() {
 
                                 <div className="job-meta">
                                     <span>📍 {job.location || 'Remote'}</span>
-                                    <span>💰 ${job.minSalary?.toLocaleString() || 'Negotiable'}</span>
+                                    <span>💸 ${job.minSalary?.toLocaleString() || 'Negotiable'}</span>
                                     <span>🕒 {new Date(job.createdAt).toLocaleDateString()}</span>
                                 </div>
 
@@ -118,6 +118,16 @@ function MyJobsTab() {
                                                             <strong>{app.applicant?.fullName || 'Unknown'}</strong>
                                                             <div style={{color: '#7f8c8d', fontSize: '0.9rem'}}>
                                                                 {app.applicant?.email}
+                                                            </div>
+                                                            <div style={{color: '#2563eb', fontSize: '0.9rem', fontWeight: 600}}>
+                                                                Match Score: {app.matchScore ?? 'N/A'}%
+                                                            </div>
+                                                            <div style={{color: '#666', fontSize: '0.85rem'}}>
+                                                                Skills {app.skillScore ?? 'N/A'}%
+                                                                Title {app.titleScore ?? 'N/A'}%
+                                                                Location {app.locationScore ?? 'N/A'}%
+                                                                Salary {app.salaryScore ?? 'N/A'}%
+                                                                Type {app.jobTypeScore ?? 'N/A'}%
                                                             </div>
                                                         </div>
 
