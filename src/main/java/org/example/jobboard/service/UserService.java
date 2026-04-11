@@ -10,6 +10,8 @@ import org.example.jobboard.repo.UserRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -64,12 +66,16 @@ public class UserService {
         // Generate Token
         String token = jwtService.generateToken(user.getUsername());
 
+        user.setLastLoginAt(LocalDateTime.now());
+        user.setWarningEmailSent(false);// Reset once login
+        userRepo.save(user);
         // Return the Response DTO to forntend
         return new AuthResponse(
                 token,
-                user.getRole().name(),
+                user.getRole().toString(),
                 user.getId(),
-                user.getEmail()
+                user.getEmail(),
+                user.getFullName()
         );
 
     }
