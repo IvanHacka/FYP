@@ -8,5 +8,5 @@ import java.util.List;
 
 //Join Table
 public interface JobSkillRepo extends JpaRepository<JobSkill, Long>{
-    List<JobSkill> findByJobId(Long id); // Get skills that are linked to the job
+    List<JobSkill> findByJobId(Long jobId); // Get skills that are linked to the job
 }
