@@ -20,4 +20,10 @@ public class ApplicationsResponse {
     private String status;
     private LocalDateTime createdAt;
     private BigDecimal matchScore;
+    private BigDecimal skillScore;
+    private BigDecimal salaryScore;
+    private BigDecimal locationScore;
+    private BigDecimal titleScore;
+    private BigDecimal jobTypeScore;
+
 }

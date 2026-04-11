@@ -2,6 +2,7 @@ package org.example.jobboard.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.jobboard.dto.MatchScoreBreakdownRequest;
 import org.example.jobboard.model.EmployeeSkill;
 import org.example.jobboard.model.Job;
 import org.example.jobboard.model.User;
@@ -44,6 +45,10 @@ public class MatchingService {
 
 
     public BigDecimal calculateMatchScore(Long jobId, Long userId) {
+        return calculateBreakdowns(jobId, userId).getFinalScore();
+    }
+
+    public MatchScoreBreakdownRequest calculateBreakdowns(Long jobId, Long userId) {
         Job job = jobRepo.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
@@ -64,8 +69,14 @@ public class MatchingService {
                 .add(salaryScore.multiply(SALARY_WEIGHT))
                 .add(jobTypeScore.multiply(JOB_TYPE_WEIGHT));
 
-        // Only return 2 digit
-        return finalScore.setScale(2, RoundingMode.HALF_UP);
+        return new MatchScoreBreakdownRequest(
+                finalScore,
+                skillScore,
+                salaryScore,
+                locationScore,
+                titleScore,
+                jobTypeScore
+        );
     }
 
     private BigDecimal calculateSkillScore(Long jobId, Long userId) {
