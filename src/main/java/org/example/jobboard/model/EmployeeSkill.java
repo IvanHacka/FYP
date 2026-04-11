@@ -31,7 +31,7 @@ public class EmployeeSkill {
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
 
-    // 1 = Beginner, 2 = Intermediate, 3 = advanced, 4 = expert
+    // 1 = Beginner, 2 = Basic, 3 = Intermediate, 4 = advanced, 5 = expert
     @Column(name = "proficiency_level")
     private Integer proficiencyLevel;
 

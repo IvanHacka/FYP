@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeSkillRepo extends JpaRepository<EmployeeSkill, Long>{
-    List<EmployeeSkill> findByUserId(Long id); // Get skills that are linked to the employee
+    List<EmployeeSkill> findByUserId(Long userId); // Get skills that are linked to the employee
 
     Optional<EmployeeSkill> findByUserIdAndSkillId(Long id, Long skillId); // find specific skill for the user
 
