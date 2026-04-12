@@ -150,6 +150,15 @@ export const searchJobs = (filters = {}) => {
     return api.get(`/jobs/search?${params.toString()}`)
 }
 
+export const deleteJob = (jobId) => {
+    return api.delete(`/jobs/${jobId}`);
+};
+
+// job status
+export const updateJobStatus = (jobId, newStatus) => {
+    return api.put(`/jobs/${jobId}/status?status=${newStatus}`)
+}
+
 export const getWatchList = () => {
     return api.get('/watchList');
 };
@@ -160,6 +169,23 @@ export const saveJob = (jobId) => {
 
 export const removeSavedJob = (jobId) => {
     return api.delete(`/watchList/${jobId}`);
+};
+
+// Job skill
+export const addJobSkill = (jobId, skillData) => {
+    return api.post(`/jobSkills/${jobId}`, skillData);
+};
+
+export const getJobSkills = (jobId) => {
+    return api.get(`/jobSkills/${jobId}`);
+};
+
+export const updateJobSkill = (jobSkillId, importanceLevel) => {
+    return api.put(`/jobSkills/${jobSkillId}`, {importanceLevel});
+};
+
+export const deleteJobSkill = (jobSkillId) => {
+    return api.delete(`/jobSkills/${jobSkillId}`);
 };
 
 // Application

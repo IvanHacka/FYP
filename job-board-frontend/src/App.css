@@ -1,4 +1,4 @@
-/* ==================== CSS Variables ==================== */
+/*  Color Variables  */
 :root {
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
@@ -20,7 +20,7 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* ==================== Base Styles ==================== */
+/*  Base Styles  */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -51,7 +51,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* ==================== Layout ==================== */
+/*  Layout  */
 .page {
   min-height: 100vh;
   display: flex;
@@ -68,7 +68,7 @@ a:hover {
   padding: 0 20px;
 }
 
-/* ==================== Navbar ==================== */
+/*  Navbar  */
 .navbar {
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
@@ -122,7 +122,7 @@ a:hover {
   opacity: 0.8;
 }
 
-/* ==================== Buttons ==================== */
+/*  Buttons  */
 .btn {
   padding: 10px 20px;
   border-radius: 8px;
@@ -185,7 +185,7 @@ a:hover {
   border-radius: 8px;
   cursor: not-allowed;
 }
-/* ==================== Forms & Inputs ==================== */
+/*  Forms & Inputs  */
 input, textarea, select {
   width: 100%;
   padding: 12px 16px;
@@ -221,7 +221,7 @@ label {
   color: var(--text-primary);
 }
 
-/* ==================== Authentication ==================== */
+/*  Authentication  */
 .auth {
   background: var(--card-bg);
   max-width: 420px;
@@ -238,7 +238,7 @@ label {
   margin-top: 20px;
 }
 
-/* ==================== Dashboard Panels ==================== */
+/*  Dashboard Panels  */
 .dashboard-panel {
   background: var(--card-bg);
   padding: 28px;
@@ -275,7 +275,7 @@ label {
   color: #92400e;
 }
 
-/* ==================== Job Form ==================== */
+/*  Job Form  */
 .job-form {
   display: flex;
   flex-direction: column;
@@ -288,7 +288,7 @@ label {
   gap: 16px;
 }
 
-/* ==================== Search Bar ==================== */
+/*  Search Bar  */
 .search-bar {
   background: white;
   padding: 24px;
@@ -321,7 +321,7 @@ label {
   flex-wrap: wrap;
 }
 
-/* ==================== Jobs Section ==================== */
+/*  Jobs Section  */
 .jobs-section {
   margin-top: 32px;
 }
@@ -346,7 +346,7 @@ label {
   font-size: 0.95rem;
 }
 
-/* ==================== Job Cards ==================== */
+/*  Job Cards  */
 .job-list {
   list-style: none;
   padding: 0;
@@ -410,7 +410,7 @@ label {
   flex-wrap: wrap;
 }
 
-/* ==================== Status Badges ==================== */
+/*  Status Badges  */
 .status-badge {
   padding: 6px 14px;
   border-radius: 20px;
@@ -437,7 +437,7 @@ label {
   margin-left: 12px;
 }
 
-/* ==================== Application List ==================== */
+/*  Application List  */
 .application-list {
   list-style: none;
   padding: 0;
@@ -454,7 +454,7 @@ label {
   border-left: 3px solid #10b981;
 }
 
-/* ==================== Applicants List ==================== */
+/*  Applicants List  */
 .applicants-list {
   list-style: none;
   padding: 0;
@@ -479,7 +479,7 @@ label {
   flex: 1;
 }
 
-/* ==================== AdminPanel.js Table ==================== */
+/*  AdminPanel.js Table  */
 .table-container {
   overflow-x: auto;
 }
@@ -507,7 +507,7 @@ label {
   background: #f8fafc;
 }
 
-/* ==================== CV Upload ==================== */
+/*  CV Upload  */
 .cv-upload {
   display: flex;
   gap: 12px;
@@ -521,7 +521,7 @@ label {
   padding: 10px;
 }
 
-/* ==================== Empty State ==================== */
+/*  Empty State  */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -547,7 +547,7 @@ label {
   margin: 0 auto;
 }
 
-/* ==================== Responsive Design ==================== */
+/*  Responsive Design  */
 @media (max-width: 768px) {
   .container {
     padding: 0 16px;

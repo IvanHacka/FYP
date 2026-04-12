@@ -2,8 +2,8 @@ package org.example.jobboard.service;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import org.example.jobboard.dto.ApplicationsResponse;
+import org.example.jobboard.dto.MatchScoreBreakdownRequest;
 import org.example.jobboard.model.Application;
 import org.example.jobboard.model.Job;
 import org.example.jobboard.model.User;
@@ -61,7 +61,7 @@ public class ApplicationService {
 
         return applications.stream()
                 .map(app -> {
-                    var breakdowns = matchingService.calculateBreakdowns(
+                    MatchScoreBreakdownRequest breakdowns = matchingService.calculateBreakdowns(
                             app.getJob().getId(),
                             app.getApplicant().getId()
 
@@ -89,8 +89,35 @@ public class ApplicationService {
     }
 
 
-    public List<Application> getApplicantsForJob(Long jobId) {
-        return applicationRepo.findByJobIdOrderByCreatedAtDesc(jobId);
+    public List<ApplicationsResponse> getApplicantsForJob(Long jobId) {
+        List<Application> applications = applicationRepo.findByJobIdOrderByCreatedAtDesc(jobId);
+
+        return applications.stream()
+                .map(app -> {
+                    MatchScoreBreakdownRequest breakdowns = matchingService.calculateBreakdowns(
+                            app.getJob().getId(),
+                            app.getApplicant().getId()
+                    );
+
+                    return new ApplicationsResponse(
+                            app.getId(),
+                            app.getJob() != null ? app.getJob().getId() : null,
+                            app.getJob() != null ? app.getJob().getTitle() : null,
+                            app.getApplicant() != null ? app.getApplicant().getId() : null,
+                            app.getApplicant() != null ? app.getApplicant().getFullName() : null,
+                            app.getApplicant() != null ? app.getApplicant().getEmail() : null,
+                            app.getApplicant() != null ? app.getApplicant().getCv() : null,
+                            app.getStatus() != null ? app.getStatus().name() : null,
+                            app.getCreatedAt(),
+                            app.getMatchScore(),
+                            breakdowns.getSkillScore(),
+                            breakdowns.getTitleScore(),
+                            breakdowns.getLocationScore(),
+                            breakdowns.getSalaryScore(),
+                            breakdowns.getJobTypeScore()
+                    );
+                })
+                .toList();
     }
 
 

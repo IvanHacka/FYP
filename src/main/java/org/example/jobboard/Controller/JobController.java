@@ -34,7 +34,10 @@ public class JobController {
     // api/jobs
     @PostMapping
     // employer
-    public ResponseEntity<Job> postJob (@RequestBody JobRequest jobRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Job> postJob (
+            @RequestBody JobRequest jobRequest,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         // Current user
         User user = userRepo.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -57,19 +60,41 @@ public class JobController {
     // GET
     // api/jobs/search?title=?&location=?&salary=?
     @GetMapping("/search")
-    public ResponseEntity<List<Job>> searchJobs(@RequestParam(required = false) String title,
-                                                @RequestParam(required = false) String location,
-                                                @RequestParam(required = false) BigDecimal minSalary)
-    {
+    public ResponseEntity<List<Job>> searchJobs(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) BigDecimal minSalary
+    ) {
         return ResponseEntity.ok(jobService.searchJobs(title, location, minSalary));
     }
 
     // GET
     // api/jobs/myJobs
     @GetMapping("/myJobs")
-    public ResponseEntity<List<Job>> getMyJobs(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<Job>> getMyJobs(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         String email = userDetails.getUsername();
         User employer = userService.getUserByEmail(email);
         return ResponseEntity.ok(jobService.getJobsByEmployer(employer.getId()));
+    }
+    @DeleteMapping("/{jobId}")
+    public ResponseEntity<Void> deleteJob(
+            @PathVariable Long jobId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User employer = userService.getUserByEmail(userDetails.getUsername());
+        jobService.deleteJob(jobId, employer.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{jobId}/status")
+    public ResponseEntity<Job> updateJobStatus(
+            @PathVariable Long jobId,
+            @RequestParam Job.JobStatus status,
+            @AuthenticationPrincipal UserDetails userDetails
+    ){
+        User employer = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(jobService.updateJobStatus(jobId, employer.getId(), status));
     }
 }

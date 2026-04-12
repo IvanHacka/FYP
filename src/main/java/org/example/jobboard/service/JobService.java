@@ -73,4 +73,24 @@ public class JobService {
         return jobRepo.findById(id).orElseThrow(() -> new RuntimeException("Job not found"));
     }
 
+    public void deleteJob(Long jobId, Long employerId) {
+        Job job = jobRepo.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        if (!job.getEmployer().getId().equals(employerId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        jobRepo.delete(job);
+    }
+
+    public Job updateJobStatus(Long jobId, Long employerId, Job.JobStatus newStatus) {
+        Job job = jobRepo.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+        if(!job.getEmployer().getId().equals(employerId)) {
+            throw new RuntimeException("Who Are You?");
+        }
+        job.setStatus(newStatus);
+        return jobRepo.save(job);
+    }
+
 }

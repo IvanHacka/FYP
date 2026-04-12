@@ -60,7 +60,7 @@ public class ApplicationController {
     // GET
     // /api/applications/{jobId}
     @GetMapping("/{jobId}")
-    public ResponseEntity<List<Application>> getApplication(@PathVariable Long jobId) {
+    public ResponseEntity<List<ApplicationsResponse>> getApplication(@PathVariable Long jobId) {
         return ResponseEntity.ok(applicationService.getApplicantsForJob(jobId));
     }
 

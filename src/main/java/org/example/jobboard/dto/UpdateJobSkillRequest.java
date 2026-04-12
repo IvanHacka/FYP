@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
-public class JobSkillRequest {
-    private Long skillId;
-
+public class UpdateJobSkillRequest {
     @Min(1)
     @Max(5)
     private int importanceLevel;

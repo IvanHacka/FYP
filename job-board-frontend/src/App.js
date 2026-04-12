@@ -36,7 +36,6 @@ function App() {
 
   return (
       <div className="page">
-        {/* Navbar (sticky) */}
         <nav className="navbar">
           <div className="container nav-content">
             {/*Should go to home page when I have one*/}

@@ -227,9 +227,7 @@ function BrowseJobsTab() {
                     <div className="empty-icon">📭</div>
                     <h3>No jobs found</h3>
                     <p>
-                        {hasActiveFilters()
-                            ? 'No jobs match your search criteria. Try adjusting your filters.'
-                            : 'No open positions available at the moment. Check back later!'}
+                        {hasActiveFilters() ? 'No jobs match your search criteria.' : 'No open positions available at the moment. Check later!'}
                     </p>
                 </div>
             ) : (
@@ -241,7 +239,12 @@ function BrowseJobsTab() {
                         return (
                             <li key={job.id} className="job-card">
                                 <div className="job-card-content">
-                                    <div className="job-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                                    <div className="job-header" style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        gap: '12px'
+                                    }}>
                                         <h3>{job.title}</h3>
 
                                         <button
@@ -275,8 +278,12 @@ function BrowseJobsTab() {
                                             )
                                             : 'No description provided'}
                                     </p>
+                                    <div style={{color: '#2563eb', fontSize: '0.95rem', fontWeight: 600}}>
+                                        Match Score: {job.matchScore ?? 'N/A'}%
+                                    </div>
 
-                                    <div className="job-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                    <div className="job-actions"
+                                         style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
                                         {alreadyApplied ? (
                                             <button className="btn btn-outline btn-sm" disabled>
                                                 Applied
