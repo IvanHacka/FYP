@@ -2,7 +2,10 @@ package org.example.jobboard.Controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.jobboard.dto.AuthResponse;
+import org.example.jobboard.dto.BrowseJobResponse;
 import org.example.jobboard.dto.JobRequest;
+import org.example.jobboard.dto.UpdateExpiryRequest;
 import org.example.jobboard.model.Job;
 import org.example.jobboard.model.JobSkill;
 import org.example.jobboard.model.Skill;
@@ -53,19 +56,24 @@ public class JobController {
     // GET
     // api/jobs
     @GetMapping
-    public ResponseEntity<List<Job>> getAllOPENJobs() {
-        return ResponseEntity.ok(jobService.getAllOPENJobs());
+    public ResponseEntity<List<BrowseJobResponse>> getAllOPENJobs(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User employee = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(jobService.getAllOPENJobs(employee.getId()));
     }
 
     // GET
     // api/jobs/search?title=?&location=?&salary=?
     @GetMapping("/search")
-    public ResponseEntity<List<Job>> searchJobs(
+    public ResponseEntity<List<BrowseJobResponse>> searchJobs(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) BigDecimal minSalary
+            @RequestParam(required = false) BigDecimal minSalary,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        return ResponseEntity.ok(jobService.searchJobs(title, location, minSalary));
+        User employee = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(jobService.searchJobs(employee.getId(), title, location, minSalary));
     }
 
     // GET
@@ -96,5 +104,15 @@ public class JobController {
     ){
         User employer = userService.getUserByEmail(userDetails.getUsername());
         return ResponseEntity.ok(jobService.updateJobStatus(jobId, employer.getId(), status));
+    }
+
+    @PutMapping("/{jobId}/expiry")
+    public ResponseEntity<Job> updateExpiry(
+            @PathVariable Long jobId,
+            @RequestBody UpdateExpiryRequest request,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User employer = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(jobService.updateExpiry(jobId, employer.getId(), request.getExpiresAt()));
     }
 }
