@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getSkills, addSkill, updateSkillProficiency, deleteSkill,
-    getSkillList } from "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/api/api.js";
-import '/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/components/profile/ProfileStyle.css';
+    getSkillList } from "../../api/api.js";
+import './ProfileStyle.css';
 
 const SkillsSection = ({ onUpdate }) => {
     const [skills, setSkills] = useState([]);
@@ -22,7 +22,6 @@ const SkillsSection = ({ onUpdate }) => {
             setSkills(response.data);
         } catch (error) {
             console.error('Error loading skills:', error);
-            alert('Failed to load skills');
         } finally {
             setLoading(false);
         }
@@ -66,7 +65,6 @@ const SkillsSection = ({ onUpdate }) => {
             onUpdate(); // Refresh profile completion
         } catch (error) {
             console.error('Error adding skill:', error);
-            alert(error.response?.data || 'Failed to add skill');
         }
     };
 

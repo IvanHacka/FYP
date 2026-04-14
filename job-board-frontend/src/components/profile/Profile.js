@@ -50,18 +50,24 @@ function ProfilePage({role}) {
                 >
                     Basic Information
                 </button>
-                <button
-                    className={activeTab === 'experience' ? 'tab active' : 'tab'}
-                    onClick={() => setActiveTab('experience')}
-                >
-                    Work Experience
-                </button>
-                <button
-                    className={activeTab === 'documents' ? 'tab active' : 'tab'}
-                    onClick={() => setActiveTab('documents')}
-                >
-                    Documents
-                </button>
+                {role === 'EMPLOYEE' && (
+                    <button
+                        className={activeTab === 'experience' ? 'tab active' : 'tab'}
+                        onClick={() => setActiveTab('experience')}
+                    >
+                        Work Experience
+                    </button>
+                )}
+                {role === 'EMPLOYEE' && (
+
+                    <button
+                        className={activeTab === 'documents' ? 'tab active' : 'tab'}
+                        onClick={() => setActiveTab('documents')}
+                    >
+                        Documents
+                    </button>
+                )}
+
                 {role === 'EMPLOYEE' && (
                     <button
                         className={activeTab === 'skills' ? 'tab active' : 'tab'}
@@ -82,7 +88,7 @@ function ProfilePage({role}) {
                 {activeTab === 'documents' && (
                     <DocumentsSection onUpdate={handleProfileUpdate} />
                 )}
-                {activeTab === 'skills' && role === 'EMPLOYEE' && (
+                {activeTab === 'skills' && (
                     <SkillsSection onUpdate={handleProfileUpdate} />
                 )}
             </div>
