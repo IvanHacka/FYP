@@ -10,6 +10,7 @@ import org.example.jobboard.repo.UserRepo;
 import org.example.jobboard.repo.WatchListRepo;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -18,6 +19,7 @@ public class WatchListService {
     private final WatchListRepo watchListRepo;
     private final UserRepo userRepo;
     private final JobRepo jobRepo;
+    private final MatchingService matchingService;
 
     public WatchList saveJob(Long userId, Long jobId) {
         if (watchListRepo.existsByUserIdAndJobId(userId, jobId)) {
@@ -39,16 +41,27 @@ public class WatchListService {
     }
 
     public List<WatchListResponse> getWatchLists(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return watchListRepo.findByUserIdOrderByCreatedAtDesc(userId)
-                .stream().map(item -> new WatchListResponse(
-                        item.getId(),
-                        item.getJob().getId(),
-                        item.getJob().getTitle(),
-                        item.getJob().getLocation(),
-                        item.getJob().getDescription(),
-                        item.getJob().getMinSalary(),
-                        item.getCreatedAt()
-                )).toList();
+                .stream()
+                .map(item -> {
+                    Job job = item.getJob();
+                    BigDecimal matchScore = matchingService.calculateMatchScore(job.getId(), user.getId());
+
+                    return new WatchListResponse(
+                            item.getId(),
+                            job.getId(),
+                            job.getTitle(),
+                            job.getLocation(),
+                            job.getDescription(),
+                            job.getMinSalary(),
+                            item.getCreatedAt(),
+                            matchScore
+                    );
+                })
+                .toList();
     }
 
     public void removeSavedJob(Long userId, Long jobId) {

@@ -2,8 +2,7 @@ package org.example.jobboard.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.jobboard.dto.ApplicationsResponse;
-import org.example.jobboard.dto.MatchScoreBreakdownRequest;
+import org.example.jobboard.dto.*;
 import org.example.jobboard.model.Application;
 import org.example.jobboard.model.Job;
 import org.example.jobboard.model.User;
@@ -52,8 +51,19 @@ public class ApplicationService {
         return applicationRepo.save(application);
     }
 
-    public List<Application> getMyApplications(Long applicantId) {
-        return applicationRepo.findByApplicantIdOrderByCreatedAtDesc(applicantId);
+    public List<EmployeeApplicationResponse> getMyApplications(Long applicantId) {
+        return applicationRepo.findByApplicantIdOrderByCreatedAtDesc(applicantId)
+                .stream().map(app -> EmployeeApplicationResponse.builder()
+                        .applicationId(app.getId())
+                        .jobId(app.getJob().getId())
+                        .jobTitle(app.getJob().getTitle())
+                        .status(app.getStatus().name())
+                        .employerNotes(app.getEmployerNotes())
+                        .reviewedAt(app.getReviewedAt())
+                        .createdAt(app.getCreatedAt())
+                        .matchScore(app.getMatchScore())
+                        .build())
+                .toList();
     }
 
     public List<ApplicationsResponse> getApplicationByCompany(Long employerId) {
@@ -67,23 +77,28 @@ public class ApplicationService {
 
                     );
 
-                    return new ApplicationsResponse(
-                            app.getId(),
-                            app.getJob() != null?app.getJob().getId() : null,
-                            app.getJob() != null? app.getJob().getTitle() : null,
-                            app.getApplicant() != null? app.getApplicant().getId() : null,
-                            app.getApplicant() != null? app.getApplicant().getFullName() : null,
-                            app.getApplicant() != null? app.getApplicant().getEmail() : null,
-                            app.getApplicant() != null? app.getApplicant().getCv() : null,
-                            app.getStatus() != null? app.getStatus().name() : null,
-                            app.getCreatedAt(),
-                            app.getMatchScore(),
-                            breakdowns.getSkillScore(),
-                            breakdowns.getTitleScore(),
-                            breakdowns.getLocationScore(),
-                            breakdowns.getSalaryScore(),
-                            breakdowns.getJobTypeScore()
-                            );
+                    return ApplicationsResponse.builder()
+                            .applicationId(app.getId())
+                            .jobId(app.getJob() != null ? app.getJob().getId() : null)
+                            .jobTitle(app.getJob() != null ? app.getJob().getTitle() : null)
+                            .applicantId(app.getApplicant() != null ? app.getApplicant().getId() : null)
+                            .applicantFullName(app.getApplicant() != null ? app.getApplicant().getFullName() : null)
+                            .applicantEmail(app.getApplicant() != null ? app.getApplicant().getEmail() : null)
+                            .applicantCv(app.getApplicant() != null ? app.getApplicant().getCv() : null)
+                            .status(app.getStatus() != null ? app.getStatus().name() : null)
+                            .employerNotes(app.getEmployerNotes())
+                            .reviewedAt(app.getReviewedAt())
+                            .createdAt(app.getCreatedAt())
+                            .whyGoodFit(app.getWhyGoodFit())
+                            .expectedSalary(app.getExpectedSalary())
+                            .availableStartDate(app.getAvailableStartDate())
+                            .matchScore(breakdowns.getFinalScore())
+                            .skillScore(breakdowns.getSkillScore())
+                            .salaryScore(breakdowns.getSalaryScore())
+                            .locationScore(breakdowns.getLocationScore())
+                            .titleScore(breakdowns.getTitleScore())
+                            .jobTypeScore(breakdowns.getJobTypeScore())
+                            .build();
                 })
                 .toList();
     }
@@ -99,31 +114,40 @@ public class ApplicationService {
                             app.getApplicant().getId()
                     );
 
-                    return new ApplicationsResponse(
-                            app.getId(),
-                            app.getJob() != null ? app.getJob().getId() : null,
-                            app.getJob() != null ? app.getJob().getTitle() : null,
-                            app.getApplicant() != null ? app.getApplicant().getId() : null,
-                            app.getApplicant() != null ? app.getApplicant().getFullName() : null,
-                            app.getApplicant() != null ? app.getApplicant().getEmail() : null,
-                            app.getApplicant() != null ? app.getApplicant().getCv() : null,
-                            app.getStatus() != null ? app.getStatus().name() : null,
-                            app.getCreatedAt(),
-                            app.getMatchScore(),
-                            breakdowns.getSkillScore(),
-                            breakdowns.getTitleScore(),
-                            breakdowns.getLocationScore(),
-                            breakdowns.getSalaryScore(),
-                            breakdowns.getJobTypeScore()
-                    );
+                    return ApplicationsResponse.builder()
+                            .applicationId(app.getId())
+                            .jobId(app.getJob() != null ? app.getJob().getId() : null)
+                            .jobTitle(app.getJob() != null ? app.getJob().getTitle() : null)
+                            .applicantId(app.getApplicant() != null ? app.getApplicant().getId() : null)
+                            .applicantFullName(app.getApplicant() != null ? app.getApplicant().getFullName() : null)
+                            .applicantEmail(app.getApplicant() != null ? app.getApplicant().getEmail() : null)
+                            .applicantPhone(app.getApplicant() != null ? app.getApplicant().getPhone() : null)
+                            .applicantLinkedinUrl(app.getApplicant() != null ? app.getApplicant().getLinkedinUrl() : null)
+                            .applicantPortfolioUrl(app.getApplicant() != null ? app.getApplicant().getPortfolioUrl() : null)
+                            .applicantBio(app.getApplicant() != null ? app.getApplicant().getBio() : null)
+                            .applicantCv(app.getApplicant() != null ? app.getApplicant().getCv() : null)
+                            .status(app.getStatus() != null ? app.getStatus().name() : null)
+                            .employerNotes(app.getEmployerNotes())
+                            .reviewedAt(app.getReviewedAt())
+                            .createdAt(app.getCreatedAt())
+                            .whyGoodFit(app.getWhyGoodFit())
+                            .expectedSalary(app.getExpectedSalary())
+                            .availableStartDate(app.getAvailableStartDate())
+                            .matchScore(breakdowns.getFinalScore())
+                            .skillScore(breakdowns.getSkillScore())
+                            .salaryScore(breakdowns.getSalaryScore())
+                            .locationScore(breakdowns.getLocationScore())
+                            .titleScore(breakdowns.getTitleScore())
+                            .jobTypeScore(breakdowns.getJobTypeScore())
+                            .build();
                 })
                 .toList();
     }
 
 
-    public Application updateApplicationStatus(Long applicationId, Long employerId,
-                                               Application.ApplicationStatus status,
-                                               String employerNotes) {
+    public UpdateApplicationStatusResponse updateApplicationStatus(Long applicationId, Long employerId,
+                                                                   Application.ApplicationStatus status,
+                                                                   String employerNotes) {
         Application application = applicationRepo.findByIdAndJobEmployerId(applicationId, employerId)
                 .orElseThrow(() -> new RuntimeException("Application not found or access denied"));
 
@@ -131,7 +155,14 @@ public class ApplicationService {
         application.setEmployerNotes(employerNotes);
         application.setReviewedAt(java.time.LocalDateTime.now());
 
-        return applicationRepo.save(application);
+        Application savedApplication = applicationRepo.save(application);
+
+        return UpdateApplicationStatusResponse.builder()
+                .applicationId(savedApplication.getId())
+                .status(savedApplication.getStatus().name())
+                .employerNotes(savedApplication.getEmployerNotes())
+                .reviewedAt(savedApplication.getReviewedAt())
+                .build();
     }
 
     public Application withdrawApplication(Long applicationId, Long applicantId) {

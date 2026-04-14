@@ -2,10 +2,7 @@ package org.example.jobboard.Controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.jobboard.dto.ApplicationsResponse;
-import org.example.jobboard.dto.ApplyJobRequest;
-import org.example.jobboard.dto.MatchScoreBreakdownRequest;
-import org.example.jobboard.dto.UpdateApplicationStatusRequest;
+import org.example.jobboard.dto.*;
 import org.example.jobboard.model.Application;
 import org.example.jobboard.model.User;
 import org.example.jobboard.service.ApplicationService;
@@ -67,7 +64,7 @@ public class ApplicationController {
 
 
     @GetMapping("/employee")
-    public ResponseEntity<List<Application>> getMyApplications(
+    public ResponseEntity<List<EmployeeApplicationResponse>> getMyApplications(
             @AuthenticationPrincipal UserDetails userDetails) {
         User applicant = userService.getUserByEmail(userDetails.getUsername());
         return ResponseEntity.ok(applicationService.getMyApplications(applicant.getId()));
@@ -75,7 +72,7 @@ public class ApplicationController {
 
 
     @PutMapping("/{applicationId}/status")
-    public ResponseEntity<Application> updateStatus(@PathVariable Long applicationId,
+    public ResponseEntity<UpdateApplicationStatusResponse> updateStatus(@PathVariable Long applicationId,
                                                     @RequestBody UpdateApplicationStatusRequest request,
                                                     @AuthenticationPrincipal UserDetails userDetails) {
         User employer = userService.getUserByEmail(userDetails.getUsername());

@@ -21,6 +21,7 @@ function MyJobsTab() {
     const [showSkills, setShowSkills] = useState(null);
 
     const [editExpiryByJob, setEditExpiryByJob] = useState({});
+    const [employerNotesByApplication, setEmployerNotesByApplication] = useState({});
 
     useEffect(() => {
         loadMyJobs();
@@ -236,21 +237,53 @@ function MyJobsTab() {
             console.log('Application id is missing');
             return;
         }
+        const employerNotes = employerNotesByApplication[applicationId] || '';
         try {
-            const res = await updateApplicationStatus(applicationId, status, '');
+            const res = await updateApplicationStatus(applicationId, status, employerNotes);
             setApplications(prev =>
                 prev.map(app =>
                     app.applicationId === applicationId ?
                         {
                             ...app,
                             status: res.data.status,
-                            employerNotes: res.data.employerNotes
+                            employerNotes: res.data.employerNotes,
+                            reviewedAt:res.data.reviewedAt
                         }
                         : app
                 )
             );
         } catch (error) {
             console.error('Failed to update application status:', error);
+        }
+    };
+    const handleSaveEmployerNotes = async (applicationId, currentStatus) => {
+        if (!applicationId) {
+            alert('Application id is missing');
+            return;
+        }
+
+        const employerNotes = employerNotesByApplication[applicationId] || '';
+
+        try {
+            const res = await updateApplicationStatus(applicationId, currentStatus, employerNotes);
+
+            setApplications(prev =>
+                prev.map(app =>
+                    app.applicationId === applicationId
+                        ? {
+                            ...app,
+                            status: res.data.status,
+                            employerNotes: res.data.employerNotes,
+                            reviewedAt: res.data.reviewedAt
+                        }
+                        : app
+                )
+            );
+
+            alert('Notes saved');
+        } catch (error) {
+            console.error('Failed to save employer notes:', error);
+            alert(error?.response?.data?.message || 'Failed to save notes');
         }
     };
 
@@ -416,6 +449,7 @@ function MyJobsTab() {
                                         </button>
                                     </div>
 
+
                                     {showSkills === job.id && (
                                         <div className="detail-box" style={{marginTop: '16px'}}>
                                             <h4>Required Skills</h4>
@@ -547,36 +581,41 @@ function MyJobsTab() {
                                             ) : (
                                                 <ul className="applicants-list">
                                                     {applications.map(app => (
-                                                        <li key={app.id} className="applicant-item">
-                                                            <div className="applicant-info">
-                                                                <strong>{app.applicantFullName || 'Unknown'}</strong>
+                                                        <li key={app.applicationId} className="applicant-item">
+                                                            <div className="applicant-info" style={{ width: '100%' }}>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                                                                    <div>
+                                                                        <strong style={{ fontSize: '1rem' }}>{app.applicantFullName || 'Unknown'}</strong>
 
-                                                                <div style={{color: '#7f8c8d', fontSize: '0.9rem'}}>
-                                                                    {app.applicantEmail}
+                                                                        <div style={{ color: '#7f8c8d', fontSize: '0.9rem', marginTop: '4px' }}>
+                                                                            {app.applicantEmail}
+                                                                        </div>
+
+                                                                        {app.applicantPhone && (
+                                                                            <div style={{ color: '#7f8c8d', fontSize: '0.9rem' }}>
+                                                                                {app.applicantPhone}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <div style={{ textAlign: 'right' }}>
+                                                                        <div style={{ color: '#2563eb', fontSize: '0.95rem', fontWeight: 600 }}>
+                                                                            Match Score: {app.matchScore ?? 'N/A'}%
+                                                                        </div>
+
+                                                                        <div style={{ color: '#666', fontSize: '0.85rem', marginTop: '4px' }}>
+                                                                            Status: {app.status || 'SUBMITTED'}
+                                                                        </div>
+
+                                                                        {app.reviewedAt && (
+                                                                            <div style={{ color: '#666', fontSize: '0.8rem' }}>
+                                                                                Reviewed: {new Date(app.reviewedAt).toLocaleString()}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
 
-                                                                <div style={{
-                                                                    color: '#2563eb',
-                                                                    fontSize: '0.9rem',
-                                                                    fontWeight: 600,
-                                                                    marginTop: '6px'
-                                                                }}>
-                                                                    Match Score: {app.matchScore ?? 'N/A'}%
-                                                                </div>
-
-                                                                <div style={{
-                                                                    color: '#666',
-                                                                    fontSize: '0.85rem',
-                                                                    marginTop: '4px'
-                                                                }}>
-                                                                    Status: {app.status || 'SUBMITTED'}
-                                                                </div>
-
-                                                                <div style={{
-                                                                    color: '#666',
-                                                                    fontSize: '0.85rem',
-                                                                    marginTop: '8px'
-                                                                }}>
+                                                                <div style={{ marginTop: '12px', color: '#666', fontSize: '0.85rem' }}>
                                                                     <div>Skills: {app.skillScore ?? 'N/A'}%</div>
                                                                     <div>Title: {app.titleScore ?? 'N/A'}%</div>
                                                                     <div>Location: {app.locationScore ?? 'N/A'}%</div>
@@ -584,12 +623,60 @@ function MyJobsTab() {
                                                                     <div>Type: {app.jobTypeScore ?? 'N/A'}%</div>
                                                                 </div>
 
-                                                                <div style={{
-                                                                    marginTop: '10px',
-                                                                    display: 'flex',
-                                                                    gap: '8px',
-                                                                    flexWrap: 'wrap'
-                                                                }}>
+                                                                {app.whyGoodFit && (
+                                                                    <div style={{ marginTop: '12px' }}>
+                                                                        <strong>Why good fit</strong>
+                                                                        <div style={{ marginTop: '4px', color: '#444' }}>{app.whyGoodFit}</div>
+                                                                    </div>
+                                                                )}
+
+                                                                <div style={{ marginTop: '12px', color: '#666', fontSize: '0.85rem' }}>
+                                                                    {app.expectedSalary && (
+                                                                        <div>Expected Salary: ${Number(app.expectedSalary).toLocaleString()}</div>
+                                                                    )}
+                                                                    {app.availableStartDate && (
+                                                                        <div>Available Start Date: {new Date(app.availableStartDate).toLocaleDateString()}</div>
+                                                                    )}
+                                                                </div>
+
+                                                                {(app.applicantLinkedinUrl || app.applicantPortfolioUrl) && (
+                                                                    <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                                                        {app.applicantLinkedinUrl && (
+                                                                            <a href={app.applicantLinkedinUrl} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm">
+                                                                                LinkedIn
+                                                                            </a>
+                                                                        )}
+                                                                        {app.applicantPortfolioUrl && (
+                                                                            <a href={app.applicantPortfolioUrl} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm">
+                                                                                Portfolio
+                                                                            </a>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+
+                                                                {app.applicantBio && (
+                                                                    <div style={{ marginTop: '12px' }}>
+                                                                        <strong>Profile Summary</strong>
+                                                                        <div style={{ marginTop: '4px', color: '#444' }}>{app.applicantBio}</div>
+                                                                    </div>
+                                                                )}
+
+                                                                <div style={{ marginTop: '12px' }}>
+                                                                    <textarea
+                                                                        className="form-control"
+                                                                        rows="4"
+                                                                        placeholder="Notes to employee"
+                                                                        value={employerNotesByApplication[app.applicationId] ?? app.employerNotes ?? ''}
+                                                                        onChange={(e) =>
+                                                                            setEmployerNotesByApplication(prev => ({
+                                                                                ...prev,
+                                                                                [app.applicationId]: e.target.value
+                                                                            }))
+                                                                        }
+                                                                    />
+                                                                </div>
+
+                                                                <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                                                     <button
                                                                         className="btn btn-outline btn-sm"
                                                                         onClick={() => handleApplicationStatusChange(app.applicationId, 'SHORTLISTED')}
@@ -605,25 +692,22 @@ function MyJobsTab() {
                                                                     >
                                                                         Reject
                                                                     </button>
-                                                                </div>
-                                                            </div>
 
-                                                            <div>
-                                                                {app.applicantCv ? (
-                                                                    <a
-                                                                        href={getCvDownloadUrl(app.applicantCv)}
-                                                                        target="_blank"
-                                                                        rel="noreferrer"
-                                                                        className="btn btn-sm btn-outline"
-                                                                    >
-                                                                        Download CV
-                                                                    </a>
-                                                                ) : (
-                                                                    <span
-                                                                        style={{color: '#e74c3c', fontSize: '0.85rem'}}>
-                                                                        No CV uploaded
-                                                                    </span>
-                                                                )}
+                                                                    {app.applicantCv ? (
+                                                                        <a
+                                                                            href={getCvDownloadUrl(app.applicantCv)}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="btn btn-sm btn-outline"
+                                                                        >
+                                                                            Download CV
+                                                                        </a>
+                                                                    ) : (
+                                                                        <span style={{ color: '#e74c3c', fontSize: '0.85rem' }}>
+                                                                            No CV uploaded
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </li>
                                                     ))}

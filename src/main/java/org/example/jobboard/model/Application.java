@@ -70,7 +70,7 @@ public class Application {
     // might send a form or a invitation if shortlisted ?
     public enum ApplicationStatus {
         SUBMITTED,
-        UNDER_REVIEWED,
+        UNDER_REVIEW,
         SHORTLISTED,
         REJECTED,
         ACCEPTED,

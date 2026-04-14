@@ -83,9 +83,6 @@ export const deleteDocument = (documentId) => {
     return api.delete(`/profile/documents/${documentId}`);
 };
 
-export const hasCv = () => {
-    return api.get('/profile/hasCv');
-}
 
 // Skills
 
@@ -121,10 +118,6 @@ export const fetchJobs = () => {
 export const fetchApplications = (jobId) => {
     return api.get(`/applications/${jobId}`);
 };
-// export const applyJob = (jobId, userId) => {
-//     // Send JSON object
-//     return api.post('/applications/apply', {jobId: jobId, userId: userId})
-// };
 export const applyJob = (jobId, whyGoodFit = '') => {
     return api.post('/applications/apply', {jobId, whyGoodFit});
 };
@@ -158,6 +151,10 @@ export const deleteJob = (jobId) => {
 export const updateJobStatus = (jobId, newStatus) => {
     return api.put(`/jobs/${jobId}/status?status=${newStatus}`)
 }
+
+export const updateJobExpiry = (jobId, expiresAt) => {
+    return api.put(`/jobs/${jobId}/expiry`, { expiresAt });
+};
 
 export const getWatchList = () => {
     return api.get('/watchList');
@@ -204,16 +201,8 @@ export const withdrawApplication = (applicationId) => {
     return api.put(`/applications/${applicationId}/withdraw`);
 };
 
-export const uploadCv = (userId, file) => {
-    const formData = new FormData();
-    // match @RequestParam
-    formData.append('file', file);
-
-    return api.post(`/employees/${userId}/cv`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+export const getMatchScoreBreakdown = (jobId) => {
+    return api.get(`/applications/matchScore/${jobId}`);
 };
 
 // no axios only use link

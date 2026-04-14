@@ -16,5 +16,6 @@ public class WatchListResponse {
     private String description;
     private BigDecimal minSalary;
     private LocalDateTime savedAt;
+    private BigDecimal matchScore;
 
 }
