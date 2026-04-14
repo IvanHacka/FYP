@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {fetchJobs, searchJobs, getEmployeeApplications, applyJob, getWatchList, saveJob, removeSavedJob
+import {fetchJobs, searchJobs, getEmployeeApplications, applyJob, getWatchList,
+    saveJob, removeSavedJob, getMatchScoreBreakdown
 } from '../../api/api';
 
 function BrowseJobsTab() {
@@ -8,6 +9,10 @@ function BrowseJobsTab() {
     const [watchListJobIds, setWatchListJobIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
+
+    // Breakdowns
+    const [scoreDetailsByJob, setScoreDetailsByJob] = useState({});
+    const [openScoreJobId, setOpenScoreJobId] = useState(null);
 
     const [searchFilters, setSearchFilters] = useState({
         title: '',
@@ -27,13 +32,12 @@ function BrowseJobsTab() {
             setJobs(jobsRes.data || []);
         } catch (error) {
             console.error('Failed to load jobs:', error);
-            alert('Failed to load jobs');
         }
 
         try {
             const appsRes = await getEmployeeApplications();
             const appliedIds = new Set(
-                (appsRes.data || []).map(app => app.job?.id).filter(Boolean)
+                (appsRes.data || []).map(app => app.jobId).filter(Boolean)
             );
             setAppliedJobIds(appliedIds);
         } catch (error) {
@@ -43,7 +47,7 @@ function BrowseJobsTab() {
         try {
             const watchRes = await getWatchList();
             const savedIds = new Set(
-                (watchRes.data || []).map(item => item.job?.id).filter(Boolean)
+                (watchRes.data || []).map(job => job.jobId).filter(Boolean)
             );
             setWatchListJobIds(savedIds);
         } catch (error) {
@@ -70,7 +74,6 @@ function BrowseJobsTab() {
             setJobs(response.data || []);
         } catch (error) {
             console.error('Search failed:', error);
-            alert('Search failed. Please try again.');
         } finally {
             setIsSearching(false);
         }
@@ -88,7 +91,6 @@ function BrowseJobsTab() {
             setJobs(response.data || []);
         } catch (error) {
             console.error('Failed to reload jobs:', error);
-            alert('Failed to reload jobs');
         }
     };
 
@@ -131,9 +133,27 @@ function BrowseJobsTab() {
             }
         } catch (error) {
             console.error('Failed to update watchlist:', error);
-            const message =
-                error?.response?.data?.message || 'Could not update watchlist';
-            alert(message);
+            console.error(error?.response?.data?.message || 'Could not update watchlist');
+        }
+    };
+
+    const handleToggleScoreDetails = async (jobId) => {
+        if (openScoreJobId === jobId) {
+            setOpenScoreJobId(null);
+            return;
+        }
+
+        try {
+            if (!scoreDetailsByJob[jobId]) {
+                const res = await getMatchScoreBreakdown(jobId);
+                setScoreDetailsByJob(prev => ({
+                    ...prev,
+                    [jobId]: res.data
+                }));
+            }
+            setOpenScoreJobId(jobId);
+        } catch (error) {
+            console.error('Failed to load match breakdown:', error);
         }
     };
 
@@ -151,7 +171,7 @@ function BrowseJobsTab() {
             <div className="section-header">
                 <h2>Available Positions</h2>
                 <button className="btn btn-outline" onClick={loadData}>
-                    🔄 Refresh
+                    ↻ Refresh ↻
                 </button>
             </div>
 
@@ -159,7 +179,7 @@ function BrowseJobsTab() {
                 <form onSubmit={handleSearch} className="search-form">
                     <div className="search-inputs">
                         <div className="input-group">
-                            <label htmlFor="title">🔍 Job Title</label>
+                            <label htmlFor="title">⌕ Job Title ⌕</label>
                             <input
                                 type="text"
                                 id="title"
@@ -171,7 +191,7 @@ function BrowseJobsTab() {
                         </div>
 
                         <div className="input-group">
-                            <label htmlFor="location">📍 Location</label>
+                            <label htmlFor="location">✈︎ Location ✈︎</label>
                             <input
                                 type="text"
                                 id="location"
@@ -183,7 +203,7 @@ function BrowseJobsTab() {
                         </div>
 
                         <div className="input-group">
-                            <label htmlFor="minSalary">💰 Min Salary</label>
+                            <label htmlFor="minSalary">$ Min Salary $</label>
                             <input
                                 type="number"
                                 id="minSalary"
@@ -201,7 +221,7 @@ function BrowseJobsTab() {
                             className="btn btn-primary"
                             disabled={isSearching}
                         >
-                            {isSearching ? '⏳ Searching...' : '🔍 Search Jobs'}
+                            {isSearching ? 'ೱ Searching...' : '⌕ Search Jobs'}
                         </button>
 
                         {hasActiveFilters() && (
@@ -210,7 +230,7 @@ function BrowseJobsTab() {
                                 onClick={handleClearSearch}
                                 className="btn btn-outline"
                             >
-                                ✕ Clear Filters
+                                ⛌ Clear Filters ⛌
                             </button>
                         )}
                     </div>
@@ -218,16 +238,17 @@ function BrowseJobsTab() {
             </div>
 
             <div className="job-count">
-                {hasActiveFilters() && <span>🎯 Search Results: </span>}
+                {hasActiveFilters() && <span> Search Results: </span>}
                 <strong>{jobs.length}</strong> job{jobs.length !== 1 ? 's' : ''} available
             </div>
 
             {jobs.length === 0 ? (
                 <div className="empty-state">
-                    <div className="empty-icon">📭</div>
+                    <div className="empty-icon">✉︎</div>
                     <h3>No jobs found</h3>
                     <p>
-                        {hasActiveFilters() ? 'No jobs match your search criteria.' : 'No open positions available at the moment. Check later!'}
+                        {hasActiveFilters() ? 'No jobs match your search criteria.' :
+                            'No open positions available at the moment. Check later!'}
                     </p>
                 </div>
             ) : (
@@ -248,29 +269,24 @@ function BrowseJobsTab() {
                                         <h3>{job.title}</h3>
 
                                         <button
-                                            className="heart-btn"
+                                            className={`heart-btn ${isSaved ? 'saved' : ''}`}
                                             onClick={() => toggleWatchList(job.id)}
                                             title={isSaved ? 'Remove from watchlist' : 'Save to watchlist'}
                                             type="button"
-                                            style={{
-                                                fontSize: '1.4rem',
-                                                background: 'none',
-                                                border: 'none',
-                                                cursor: 'pointer'
-                                            }}
                                         >
-                                            {isSaved ? '❤️' : '🤍'}
+                                            {isSaved ? '-`♡´-' : '♡'}
                                         </button>
                                     </div>
 
                                     <div className="job-meta">
-                                        <span>📍 {job.location || 'Remote'}</span>
-                                        <span>💰 ${job.minSalary?.toLocaleString() || 'Negotiable'}</span>
-                                        <span>🕒 {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently posted'}</span>
+                                        <span>✈︎ {job.location || 'Remote'} ✈︎</span>
+                                        <span>$ {job.minSalary?.toLocaleString() || 'Negotiable'} $</span>
+                                        <span>◴ {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently posted'} ◴</span>
+                                        <span>ⴵ Expires: {job.expiresAt ? new Date(job.expiresAt).toLocaleDateString() : 'No expiry'} ⴵ</span>
                                     </div>
 
                                     <p className="job-description">
-                                        {job.description
+                                    {job.description
                                             ? (
                                                 job.description.length > 200
                                                     ? job.description.substring(0, 200) + '...'
@@ -278,9 +294,42 @@ function BrowseJobsTab() {
                                             )
                                             : 'No description provided'}
                                     </p>
-                                    <div style={{color: '#2563eb', fontSize: '0.95rem', fontWeight: 600}}>
-                                        Match Score: {job.matchScore ?? 'N/A'}%
+                                    {job.jobSkills && job.jobSkills.length > 0 && (
+                                        <div className="job-skills-preview">
+                                            <div className="job-skills-label">Required Skills</div>
+                                            <div className="job-skills-tags">
+                                                {job.jobSkills.map(skill => (
+                                                    <span key={skill.id} className="job-skill-tag">
+                                                        {skill.skillName}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="job-match-score">
+                                        {job.matchScore != null ?
+                                            `${job.matchScore}%` :
+                                            'Match score unavailable'}
                                     </div>
+
+                                    <button
+                                        className="btn btn-outline btn-sm"
+                                        type="button"
+                                        onClick={() => handleToggleScoreDetails(job.id)}
+                                    >
+                                        {openScoreJobId === job.id ? 'Hide Match Details' : 'Why this score?'}
+                                    </button>
+
+                                    {openScoreJobId === job.id && scoreDetailsByJob[job.id] && (
+                                        <div className="detail-box">
+                                            <h4>Match Breakdown</h4>
+                                            <p>Skills: {scoreDetailsByJob[job.id].skillScore}%</p>
+                                            <p>Title: {scoreDetailsByJob[job.id].titleScore}%</p>
+                                            <p>Location: {scoreDetailsByJob[job.id].locationScore}%</p>
+                                            <p>Salary: {scoreDetailsByJob[job.id].salaryScore}%</p>
+                                            <p>Job Type: {scoreDetailsByJob[job.id].jobTypeScore}%</p>
+                                        </div>
+                                    )}
 
                                     <div className="job-actions"
                                          style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
@@ -293,7 +342,7 @@ function BrowseJobsTab() {
                                                 className="btn btn-primary btn-sm"
                                                 onClick={() => handleApply(job.id)}
                                             >
-                                                Apply Now →
+                                                Apply Now 𓂃✍︎
                                             </button>
                                         )}
 
