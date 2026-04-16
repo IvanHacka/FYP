@@ -51,4 +51,9 @@ Register, Login
    npm install
    npm start
    ```
-```
+   
+## Limitations
+Matching algorithm can be improved
+No real-time notifications
+Runs on local
+Limited filtering options
