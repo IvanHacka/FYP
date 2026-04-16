@@ -20,6 +20,8 @@ public class BrowseJobResponse {
     private String location;
     private Job.JobStatus status;
     private LocalDateTime createdAt;
+    private String companyName;
+    private String companyWebsite;
     private BigDecimal matchScore;
     private BigDecimal skillScore;
     private BigDecimal titleScore;

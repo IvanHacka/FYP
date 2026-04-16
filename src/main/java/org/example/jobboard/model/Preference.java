@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class Preference {
 
     @Column(name = "max_expected_salary")
     private BigDecimal maxExpectedSalary;
+
+    @Column(name = "available_start_date")
+    private LocalDate availableStartDate;
 
     @ElementCollection
     @CollectionTable(name = "preferred_job_types", joinColumns = @JoinColumn(name = "preference_id"))

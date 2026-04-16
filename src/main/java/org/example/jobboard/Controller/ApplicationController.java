@@ -39,7 +39,9 @@ public class ApplicationController {
         Application application = applicationService.jobApply(
                 request.getJobId(),
                 applicant.getId(),
-                request.getWhyGoodFit()
+                request.getWhyGoodFit(),
+                request.getExpectedSalary(),
+                request.getAvailableStartDate()
         );
 
         return ResponseEntity.ok(application);
@@ -63,7 +65,9 @@ public class ApplicationController {
 
 
 
-    @GetMapping("/employee")
+    // GET
+    // api/applications/employee
+    @GetMapping("/application/employee")
     public ResponseEntity<List<EmployeeApplicationResponse>> getMyApplications(
             @AuthenticationPrincipal UserDetails userDetails) {
         User applicant = userService.getUserByEmail(userDetails.getUsername());
@@ -71,7 +75,9 @@ public class ApplicationController {
     }
 
 
-    @PutMapping("/{applicationId}/status")
+    // PUT
+    // api/{applicationId}/status
+    @PutMapping("/application/{applicationId}/status")
     public ResponseEntity<UpdateApplicationStatusResponse> updateStatus(@PathVariable Long applicationId,
                                                     @RequestBody UpdateApplicationStatusRequest request,
                                                     @AuthenticationPrincipal UserDetails userDetails) {

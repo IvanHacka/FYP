@@ -12,6 +12,7 @@ import org.example.jobboard.repo.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,32 +23,44 @@ public class ApplicationService {
     private final UserRepo userRepo;
     private final MatchingService matchingService;
 
-    public Application jobApply(Long jobId, Long userId, String whyGoodFit) {
+    public Application jobApply(Long jobId, Long userId, String whyGoodFit,
+                                BigDecimal expectedSalary, LocalDate availableStartDate) {
 
         if (applicationRepo.existsByApplicantIdAndJobId(userId, jobId)) {
-            throw new RuntimeException(
-                    "You have already applied for the job with id " + jobId);
+            throw new RuntimeException("You have already applied for the job with id " + jobId);
         }
-        // Find job
-        Job job = jobRepo.findById(jobId).orElseThrow(() ->
-                new RuntimeException("Job with id " + jobId + " not found"));
+
+        Job job = jobRepo.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job with id " + jobId + " not found"));
+
         if (job.getStatus() != Job.JobStatus.OPEN) {
             throw new RuntimeException("This job is not open for applications");
         }
 
-        // Find applicant
-        User applicant = userRepo.findById(userId).orElseThrow(() ->
-                new RuntimeException("Applicant not found"));
+        User applicant = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Applicant not found"));
+
         if (applicant.getRole() != User.Role.EMPLOYEE) {
             throw new RuntimeException("Only candidate can apply");
         }
 
         BigDecimal score = matchingService.calculateMatchScore(jobId, userId);
+
+        if (expectedSalary != null && expectedSalary.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Expected salary must be greater than 0");
+        }
+
         Application application = Application.builder()
-                .job(job).applicant(applicant).matchScore(score)
-                .coverLetterDocument(applicant.getCurrentCoverLetter()).whyGoodFit(whyGoodFit)
+                .job(job)
+                .applicant(applicant)
+                .matchScore(score)
+                .coverLetterDocument(applicant.getCurrentCoverLetter())
+                .whyGoodFit(whyGoodFit)
+                .expectedSalary(expectedSalary)
+                .availableStartDate(availableStartDate)
                 .status(Application.ApplicationStatus.SUBMITTED)
                 .build();
+
         return applicationRepo.save(application);
     }
 

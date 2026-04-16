@@ -14,6 +14,10 @@ function BrowseJobsTab() {
     const [scoreDetailsByJob, setScoreDetailsByJob] = useState({});
     const [openScoreJobId, setOpenScoreJobId] = useState(null);
 
+    // Preferences
+    const [applyFormByJob, setApplyFormByJob] = useState({});
+    const [showApplyFormJobId, setShowApplyFormJobId] = useState(null);
+
     const [searchFilters, setSearchFilters] = useState({
         title: '',
         location: '',
@@ -103,11 +107,37 @@ function BrowseJobsTab() {
     };
 
     const handleApply = async (jobId) => {
-        try {
-            await applyJob(jobId);
-            alert('Application submitted successfully');
+        const form = applyFormByJob[jobId] || {};
+        const whyGoodFit = (form.whyGoodFit || '').trim();
+        const expectedSalary = form.expectedSalary;
+        const availableStartDate = form.availableStartDate;
 
+        if (!whyGoodFit) {
+            alert('Please enter why you are a good fit');
+            return;
+        }
+
+        if (expectedSalary && Number(expectedSalary) <= 0) {
+            alert('Expected salary must be greater than 0');
+            return;
+        }
+
+        if (!availableStartDate) {
+            alert('Please enter your available start date');
+            return;
+        }
+
+        try {
+            await applyJob(
+                jobId,
+                whyGoodFit,
+                expectedSalary ? Number(expectedSalary) : null,
+                availableStartDate
+            );
+
+            alert('Application submitted successfully');
             setAppliedJobIds(prev => new Set([...prev, jobId]));
+            setShowApplyFormJobId(null);
         } catch (error) {
             console.error('Application failed:', error);
             const message =
@@ -135,6 +165,11 @@ function BrowseJobsTab() {
             console.error('Failed to update watchlist:', error);
             console.error(error?.response?.data?.message || 'Could not update watchlist');
         }
+    };
+
+    // preferences for each job
+    const handleToggleApplyForm = (jobId) => {
+        setShowApplyFormJobId(prev => (prev === jobId ? null : jobId));
     };
 
     const handleToggleScoreDetails = async (jobId) => {
@@ -288,9 +323,9 @@ function BrowseJobsTab() {
                                     <p className="job-description">
                                     {job.description
                                             ? (
-                                                job.description.length > 200
-                                                    ? job.description.substring(0, 200) + '...'
-                                                    : job.description
+                                                job.description.length > 200 ?
+                                                    job.description.substring(0, 200) + '...' :
+                                                    job.description
                                             )
                                             : 'No description provided'}
                                     </p>
@@ -305,6 +340,21 @@ function BrowseJobsTab() {
                                                 ))}
                                             </div>
                                         </div>
+                                    )}
+                                    {job.companyName && (
+                                        <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '6px' }}>
+                                            Hiring: {job.companyName}
+                                        </div>
+                                    )}
+                                    {job.companyWebsite && (
+                                        <a
+                                            href={job.companyWebsite}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="btn btn-outline btn-sm"
+                                        >
+                                            Company Website
+                                        </a>
                                     )}
                                     <div className="job-match-score">
                                         {job.matchScore != null ?
@@ -340,10 +390,78 @@ function BrowseJobsTab() {
                                         ) : (
                                             <button
                                                 className="btn btn-primary btn-sm"
-                                                onClick={() => handleApply(job.id)}
+                                                onClick={() => handleToggleApplyForm(job.id)}
                                             >
-                                                Apply Now 𓂃✍︎
+                                                {showApplyFormJobId === job.id ? 'Cancel' : 'Apply Now 𓂃✍︎'}
                                             </button>
+                                        )}
+                                        {showApplyFormJobId === job.id && !alreadyApplied && (
+                                            <div className="detail-box" style={{ marginTop: '12px' }}>
+                                                <h4>Application</h4>
+
+                                                <div className="form-group" style={{ marginBottom: '10px' }}>
+                                                    <label>Why are you a good fit for this job?</label>
+                                                    <textarea
+                                                        className="form-control"
+                                                        rows="4"
+                                                        value={applyFormByJob[job.id]?.whyGoodFit || ''}
+                                                        onChange={(e) =>
+                                                            setApplyFormByJob(prev => ({
+                                                                ...prev,
+                                                                [job.id]: {
+                                                                    ...prev[job.id],
+                                                                    whyGoodFit: e.target.value
+                                                                }
+                                                            }))
+                                                        }
+                                                        placeholder="Explain why your skills and experience fit this role"
+                                                    />
+                                                </div>
+
+                                                <div className="form-group" style={{ marginBottom: '10px' }}>
+                                                    <label>Expected Salary</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        value={applyFormByJob[job.id]?.expectedSalary || ''}
+                                                        onChange={(e) =>
+                                                            setApplyFormByJob(prev => ({
+                                                                ...prev,
+                                                                [job.id]: {
+                                                                    ...prev[job.id],
+                                                                    expectedSalary: e.target.value
+                                                                }
+                                                            }))
+                                                        }
+                                                        placeholder="Enter your expected salary"
+                                                    />
+                                                </div>
+
+                                                <div className="form-group" style={{ marginBottom: '10px' }}>
+                                                    <label>Available Start Date</label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={applyFormByJob[job.id]?.availableStartDate || ''}
+                                                        onChange={(e) =>
+                                                            setApplyFormByJob(prev => ({
+                                                                ...prev,
+                                                                [job.id]: {
+                                                                    ...prev[job.id],
+                                                                    availableStartDate: e.target.value
+                                                                }
+                                                            }))
+                                                        }
+                                                    />
+                                                </div>
+
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={() => handleApply(job.id)}
+                                                >
+                                                    Submit Application
+                                                </button>
+                                            </div>
                                         )}
 
                                         <button

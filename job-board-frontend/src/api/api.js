@@ -57,6 +57,14 @@ export const deleteExperience = (id) => {
     return api.delete(`/profile/experience/${id}`);
 };
 
+export const getJobPreferences = () => {
+    return api.get('/profile/preferences');
+};
+
+export const updateJobPreferences = (data) => {
+    return api.put('/profile/preferences', data);
+};
+
 // Documents
 
 export const getDocuments = () => {
@@ -118,8 +126,8 @@ export const fetchJobs = () => {
 export const fetchApplications = (jobId) => {
     return api.get(`/applications/${jobId}`);
 };
-export const applyJob = (jobId, whyGoodFit = '') => {
-    return api.post('/applications/apply', {jobId, whyGoodFit});
+export const applyJob = (jobId, whyGoodFit, expectedSalary, availableStartDate) => {
+    return api.post('/applications/apply', {jobId, whyGoodFit, expectedSalary, availableStartDate});
 };
 
 export const createJob = (jobData) => {
