@@ -43,6 +43,17 @@ public class ProfileController {
         return ResponseEntity.ok(user);
     }
 
+    // GET
+    // api/employees/profile/completion
+    @GetMapping("/completion")
+    public ResponseEntity<ProfileCompletionResponse> getProfileCompletion(
+            @AuthenticationPrincipal UserDetails userDetails
+    ){
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        int completionScore = profileService.profileCompletion(user.getId());
+        return ResponseEntity.ok(new ProfileCompletionResponse(completionScore));
+    }
+
     // PUT api/profile/update
     @PutMapping("/update")
     public ResponseEntity<User> updateProfile(
@@ -227,4 +238,6 @@ public class ProfileController {
 
     record HasCvResponse(boolean hasCv) {
     }
+    record ProfileCompletionResponse(int completionScore) {}
+
 }

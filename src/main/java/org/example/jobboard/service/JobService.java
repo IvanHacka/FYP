@@ -73,6 +73,8 @@ public class JobService {
                     .location(job.getLocation())
                     .status(job.getStatus())
                     .createdAt(job.getCreatedAt())
+                    .companyName(job.getEmployer() != null ? job.getEmployer().getCompanyName() : null)
+                    .companyWebsite(job.getEmployer() != null ? job.getEmployer().getCompanyWebsite() : null)
                     .matchScore(breakdowns.getFinalScore())
                     .build();
         }).toList();
@@ -95,6 +97,8 @@ public class JobService {
                     .location(job.getLocation())
                     .status(job.getStatus())
                     .createdAt(job.getCreatedAt())
+                    .companyName(job.getEmployer() != null ? job.getEmployer().getCompanyName() : null)
+                    .companyWebsite(job.getEmployer() != null ? job.getEmployer().getCompanyWebsite() : null)
                     .matchScore(breakdowns.getFinalScore())
                     .build();
         }).toList();

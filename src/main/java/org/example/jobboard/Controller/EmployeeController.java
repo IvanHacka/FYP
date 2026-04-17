@@ -5,18 +5,12 @@ import org.example.jobboard.dto.SkillProficiencyRequest;
 import org.example.jobboard.model.EmployeeSkill;
 import org.example.jobboard.model.User;
 import org.example.jobboard.service.UserService;
-import org.example.jobboard.util.FileStorageUtil;
-import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
-import org.example.jobboard.dto.EmployeeProfileRequest;
 import org.example.jobboard.service.EmployeeService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,18 +28,6 @@ public class EmployeeController {
 //    ResponseEntity<User> createProfile(@RequestBody EmployeeProfileRequest employeeProfileRequest, @AuthenticationPrincipal UserDetails userDetails) {
 //        return ResponseEntity.ok(employeeService.createProfile(employeeProfileRequest, userDetails.getUsername()));
 //    }
-
-
-    // GET
-    // api/employees/profile/completion
-    @GetMapping("/profile/completion")
-    public ResponseEntity<ProfileCompletionResponse> getProfileCompletion(
-            @AuthenticationPrincipal UserDetails userDetails
-    ){
-        User user = userService.getUserByEmail(userDetails.getUsername());
-        int completionScore = employeeService.profileCompletion(user.getId());
-        return ResponseEntity.ok(new ProfileCompletionResponse(completionScore));
-    }
 
 
     // GET
@@ -120,7 +102,6 @@ public class EmployeeController {
     // ----Record DTO
     // To make readable response
 
-    record ProfileCompletionResponse(int completionScore) {}
     record SkillCountResponse(Long count) {}
 
 

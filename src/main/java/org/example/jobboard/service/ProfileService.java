@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.ExperienceRequest;
 import org.example.jobboard.model.Experience;
 import org.example.jobboard.model.User;
+import org.example.jobboard.repo.EmployeeSkillRepo;
 import org.example.jobboard.repo.ExperienceRepo;
 import org.example.jobboard.repo.UserRepo;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class ProfileService {
 
     private final UserRepo userRepo;
     private final ExperienceRepo experienceRepo;
+    private final EmployeeSkillRepo employeeSkillRepo;
 
     // add new experience
     @Transactional
@@ -77,9 +79,50 @@ public class ProfileService {
         return experienceRepo.findByUserIdOrderByStartDateDesc(userId);
     }
 
-    // Get one experience
-    public Experience getExperience(Long experienceId) {
-        return experienceRepo.findById(experienceId)
-            .orElseThrow(() -> new RuntimeException("Experience not found"));
+//    // Get one experience
+//    public Experience getExperience(Long experienceId) {
+//        return experienceRepo.findById(experienceId)
+//            .orElseThrow(() -> new RuntimeException("Experience not found"));
+//    }
+
+    // calculate completion of profile setup
+    public int profileCompletion(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        int score = 0;
+
+        if(user.getFullName() != null && !user.getFullName().isEmpty()) {
+            score += 10;
+        }
+        if(user.getBio() != null && !user.getBio().isEmpty()) {
+            score += 10;
+        }
+        if(user.getPhone() != null && !user.getPhone().isEmpty()) {
+            score += 10;
+        }
+        if(user.getAddress() != null && !user.getAddress().isEmpty()) {
+            score += 10;
+        }
+
+        Long count = employeeSkillRepo.countByUserId(userId);
+        if(count >= 5) {
+            score += 20;
+        }
+        else{
+            score += (int)(count * 4);
+        }
+
+        if(user.hasCv()){
+            score += 20;
+        }
+
+        if(!user.getExperiences().isEmpty()){
+            score += 10;
+        }
+        if(!user.getEducation().isEmpty()){
+            score += 10;
+        }
+
+        return score;
     }
 }
