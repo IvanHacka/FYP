@@ -57,14 +57,6 @@ export const deleteExperience = (id) => {
     return api.delete(`/profile/experience/${id}`);
 };
 
-export const getJobPreferences = () => {
-    return api.get('/profile/preferences');
-};
-
-export const updateJobPreferences = (data) => {
-    return api.put('/profile/preferences', data);
-};
-
 // Documents
 
 export const getDocuments = () => {
@@ -213,10 +205,11 @@ export const getMatchScoreBreakdown = (jobId) => {
     return api.get(`/applications/matchScore/${jobId}`);
 };
 
-// no axios only use link
-export const getCvDownloadUrl = (fileName) => {
-    return `http://localhost:8080/api/employees/cv/${fileName}`;
-};
+export const downloadApplicationDocumentsForEmployer = (applicationId, documentId) => {
+    return api.get(`/applications/${applicationId}/documents/${documentId}/download`, {
+        responseType: 'blob'
+    });
+}
 
 // admin
 export const fetchPendingEmployers = () => {

@@ -4,9 +4,11 @@ package org.example.jobboard.service;
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.*;
 import org.example.jobboard.model.Application;
+import org.example.jobboard.model.Document;
 import org.example.jobboard.model.Job;
 import org.example.jobboard.model.User;
 import org.example.jobboard.repo.ApplicationRepo;
+import org.example.jobboard.repo.DocumentRepo;
 import org.example.jobboard.repo.JobRepo;
 import org.example.jobboard.repo.UserRepo;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class ApplicationService {
     private final JobRepo jobRepo;
     private final UserRepo userRepo;
     private final MatchingService matchingService;
+    private final DocumentRepo documentRepo;
 
     public Application jobApply(Long jobId, Long userId, String whyGoodFit,
                                 BigDecimal expectedSalary, LocalDate availableStartDate) {
@@ -98,6 +101,22 @@ public class ApplicationService {
                             .applicantFullName(app.getApplicant() != null ? app.getApplicant().getFullName() : null)
                             .applicantEmail(app.getApplicant() != null ? app.getApplicant().getEmail() : null)
                             .applicantCv(app.getApplicant() != null ? app.getApplicant().getCv() : null)
+//                            .applicantDocuments(
+//                                    app.getApplicant() != null && app.getApplicant().getDocuments() != null
+//                                            ? app.getApplicant().getDocuments().stream()
+//                                            .map(doc -> DocumentResponse.builder()
+//                                                    .documentId(doc.getId())
+//                                                    .documentName(doc.getDocumentName())
+//                                                    .documentType(doc.getDocumentType().name())
+//                                                    .build())
+//                                            .toList()
+//                                            : List.of()
+//                            )
+                            .applicantDocuments(
+                                    app.getApplicant() != null
+                                            ? mapApplicantDocuments(app.getApplicant().getId())
+                                            : List.of()
+                            )
                             .status(app.getStatus() != null ? app.getStatus().name() : null)
                             .employerNotes(app.getEmployerNotes())
                             .reviewedAt(app.getReviewedAt())
@@ -131,6 +150,7 @@ public class ApplicationService {
                             .applicationId(app.getId())
                             .jobId(app.getJob() != null ? app.getJob().getId() : null)
                             .jobTitle(app.getJob() != null ? app.getJob().getTitle() : null)
+                            // Details
                             .applicantId(app.getApplicant() != null ? app.getApplicant().getId() : null)
                             .applicantFullName(app.getApplicant() != null ? app.getApplicant().getFullName() : null)
                             .applicantEmail(app.getApplicant() != null ? app.getApplicant().getEmail() : null)
@@ -139,6 +159,18 @@ public class ApplicationService {
                             .applicantPortfolioUrl(app.getApplicant() != null ? app.getApplicant().getPortfolioUrl() : null)
                             .applicantBio(app.getApplicant() != null ? app.getApplicant().getBio() : null)
                             .applicantCv(app.getApplicant() != null ? app.getApplicant().getCv() : null)
+                            .applicantDocuments(
+                                    app.getApplicant() != null && app.getApplicant().getDocuments() != null ?
+                                            app.getApplicant().getDocuments().stream()
+                                            .map(doc -> DocumentResponse.builder()
+                                                    .documentId(doc.getId())
+                                                    .documentName(doc.getDocumentName())
+                                                    .documentType(doc.getDocumentType().name())
+                                                    .build())
+                                            .toList()
+                                            :
+                                            List.of()
+                            )
                             .status(app.getStatus() != null ? app.getStatus().name() : null)
                             .employerNotes(app.getEmployerNotes())
                             .reviewedAt(app.getReviewedAt())
@@ -189,6 +221,26 @@ public class ApplicationService {
 
         application.setStatus(Application.ApplicationStatus.WITHDRAWN);
         return applicationRepo.save(application);
+    }
+
+    private List<DocumentResponse> mapApplicantDocuments(Long applicantId) {
+        return documentRepo.findByUserId(applicantId).stream()
+                .map(doc -> DocumentResponse.builder()
+                        .documentId(doc.getId())
+                        .documentName(doc.getDocumentName())
+                        .documentType(doc.getDocumentType().name())
+                        .build())
+                .toList();
+    }
+
+    public Document getApplicantDocumentForEmployer(Long applicationId, Long documentId, Long employerId) {
+        Application application = applicationRepo.findByIdAndJobEmployerId(applicationId, employerId)
+                .orElseThrow(() -> new RuntimeException("Application not found or access denied"));
+
+        Long applicantId = application.getApplicant().getId();
+
+        return documentRepo.findByIdAndUserId(documentId, applicantId).orElseThrow(
+                () -> new RuntimeException("Document not found or access denied"));
     }
 
 }

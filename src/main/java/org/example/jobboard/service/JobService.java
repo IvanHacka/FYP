@@ -3,10 +3,7 @@ package org.example.jobboard.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.jobboard.dto.BrowseJobResponse;
-import org.example.jobboard.dto.JobRequest;
-import org.example.jobboard.dto.MatchScoreBreakdownRequest;
-import org.example.jobboard.dto.SkillRequest;
+import org.example.jobboard.dto.*;
 import org.example.jobboard.model.*;
 import org.example.jobboard.repo.*;
 import org.springframework.stereotype.Service;
@@ -76,7 +73,14 @@ public class JobService {
                     .expiresAt(job.getExpiresAt())
                     .companyName(job.getEmployer() != null ? job.getEmployer().getCompanyName() : null)
                     .companyWebsite(job.getEmployer() != null ? job.getEmployer().getCompanyWebsite() : null)
+                    .jobSkills(mapJobSkills(job.getId()))
+
                     .matchScore(breakdowns.getFinalScore())
+                    .skillScore(breakdowns.getSkillScore())
+                    .titleScore(breakdowns.getTitleScore())
+                    .locationScore(breakdowns.getLocationScore())
+                    .salaryScore(breakdowns.getSalaryScore())
+                    .jobTypeScore(breakdowns.getJobTypeScore())
                     .build();
         }).toList();
     }
@@ -101,7 +105,14 @@ public class JobService {
                     .expiresAt(job.getExpiresAt())
                     .companyName(job.getEmployer() != null ? job.getEmployer().getCompanyName() : null)
                     .companyWebsite(job.getEmployer() != null ? job.getEmployer().getCompanyWebsite() : null)
+                    .jobSkills(mapJobSkills(job.getId()))
+
                     .matchScore(breakdowns.getFinalScore())
+                    .skillScore(breakdowns.getSkillScore())
+                    .titleScore(breakdowns.getTitleScore())
+                    .locationScore(breakdowns.getLocationScore())
+                    .salaryScore(breakdowns.getSalaryScore())
+                    .jobTypeScore(breakdowns.getJobTypeScore())
                     .build();
         }).toList();
     }
@@ -149,4 +160,15 @@ public class JobService {
         return jobRepo.save(job);
     }
 
+
+    public List<JobSkillResponse> mapJobSkills(Long jobId){
+        return jobSkillRepo.findByJobId(jobId).stream()
+                .map(s -> JobSkillResponse.builder()
+                        .id(s.getId())
+                        .skillId(s.getSkill().getId())
+                        .skillName(s.getSkill().getSkillName())
+                        .importanceLevel(s.getImportanceLevel())
+                        .build()
+                ).toList();
+    }
 }

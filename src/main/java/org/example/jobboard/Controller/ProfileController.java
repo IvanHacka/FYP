@@ -9,7 +9,6 @@ import org.example.jobboard.repo.DocumentRepo;
 import org.example.jobboard.service.ProfileService;
 import org.example.jobboard.service.UserService;
 import org.example.jobboard.util.FileStorageUtil;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.plaf.SeparatorUI;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -190,7 +190,7 @@ public class ProfileController {
         if (!document.getUser().getId().equals(user.getId())) {
             return ResponseEntity.notFound().build();
         }
-        Resource resource = fileStorageUtil.loadFileAsResource(".."+document.getFilePath());
+        Resource resource = fileStorageUtil.loadFileAsResource(Paths.get(document.getFilePath()).getFileName().toString());
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 // two possible value: inline or attachment
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {getMyJobs, fetchApplications, getCvDownloadUrl, deleteJob,
+import {getMyJobs, fetchApplications, downloadDocument, deleteJob,
     updateJobStatus, getJobSkills, addJobSkill, updateJobSkill, deleteJobSkill,
-    getSkillList, updateApplicationStatus, updateJobExpiry
-} from '../../api/api';
+    getSkillList, updateApplicationStatus, updateJobExpiry, downloadApplicationDocumentsForEmployer}
+from '../../api/api';
 
 function MyJobsTab() {
     const [myJobs, setMyJobs] = useState([]);
@@ -328,6 +328,24 @@ function MyJobsTab() {
         }
     };
 
+    const handleDownloadApplicationDocument = async (applicationId, documentId, documentName) => {
+        try {
+            const res = await downloadApplicationDocumentsForEmployer(applicationId, documentId);
+
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', documentName || 'document');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Failed to download applicant document:', error);
+            alert(error?.response?.data?.message || 'Failed to download document');
+        }
+    };
+
     const toggleApplicantDetails = (applicationId) => {
         setShowApplicantDetails(prev => ({
             ...prev,
@@ -381,11 +399,11 @@ function MyJobsTab() {
                                     </div>
 
                                     <p className="job-description">
-                                        {job.description
-                                            ? (job.description.length > 200
-                                                ? `${job.description.substring(0, 200)}...`
-                                                : job.description)
-                                            : 'No description provided'}
+                                        {job.description ?
+                                            (job.description.length > 200 ?
+                                                `${job.description.substring(0, 200)}...` :
+                                                job.description) :
+                                            'No description provided'}
                                     </p>
 
                                     <div
@@ -649,17 +667,6 @@ function MyJobsTab() {
                                                             >
                                                                 Reject
                                                             </button>
-
-                                                            {app.applicantCv && (
-                                                                <a
-                                                                    href={getCvDownloadUrl(app.applicantCv)}
-                                                                    target="_blank"
-                                                                    rel="noreferrer"
-                                                                    className="btn btn-sm btn-outline"
-                                                                >
-                                                                Download CV
-                                                                </a>
-                                                            )}
                                                         </div>
                                                     </div>
 
@@ -688,6 +695,30 @@ function MyJobsTab() {
                                                                         ${Number(app.expectedSalary).toLocaleString()}</div>}
                                                                     {app.availableStartDate && <div>Available Start
                                                                         Date: {new Date(app.availableStartDate).toLocaleDateString()}</div>}
+                                                                </div>
+                                                            )}
+
+                                                            {app.applicantDocuments && app.applicantDocuments.length > 0 && (
+                                                                <div style={{ marginTop: '12px' }}>
+                                                                    <strong>Documents</strong>
+                                                                    <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                                        {app.applicantDocuments.map(doc => (
+                                                                            <button
+                                                                                key={doc.documentId}
+                                                                                type="button"
+                                                                                className="btn btn-outline btn-sm"
+                                                                                onClick={() =>
+                                                                                    handleDownloadApplicationDocument(
+                                                                                        app.applicationId,
+                                                                                        doc.documentId,
+                                                                                        doc.documentName
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                {doc.documentType}: {doc.documentName}
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             )}
 

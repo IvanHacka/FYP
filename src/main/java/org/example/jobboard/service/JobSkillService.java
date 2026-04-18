@@ -53,12 +53,13 @@ public class JobSkillService {
 
     public List<JobSkillResponse> getAllJobSkills(Long jobId) {
         return jobSkillRepo.findByJobId(jobId).stream()
-                .map(s -> new JobSkillResponse(
-                        s.getId(),
-                        s.getSkill().getId(),
-                        s.getSkill().getSkillName(),
-                        s.getImportanceLevel()
-                )).toList();
+                .map(s -> JobSkillResponse.builder()
+                                .id(s.getId())
+                                .skillId(s.getSkill().getId())
+                                .skillName(s.getSkill().getSkillName())
+                        .importanceLevel(s.getImportanceLevel())
+                                .build()
+                ).toList();
     }
     public JobSkillResponse updateJobSkill(Long skillId, Long employerId, int importanceLevel) {
         JobSkill jobSkill = jobSkillRepo.findById(skillId).orElseThrow(

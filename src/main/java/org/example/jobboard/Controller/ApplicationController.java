@@ -4,15 +4,21 @@ package org.example.jobboard.Controller;
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.*;
 import org.example.jobboard.model.Application;
+import org.example.jobboard.model.Document;
 import org.example.jobboard.model.User;
 import org.example.jobboard.service.ApplicationService;
 import org.example.jobboard.service.MatchingService;
 import org.example.jobboard.service.UserService;
+import org.example.jobboard.util.FileStorageUtil;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.Resource;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -22,6 +28,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
     private final UserService userService;
     private final MatchingService matchingService;
+    private final FileStorageUtil fileStorageUtil;
 
     ////    public ApplicationController(ApplicationService applicationService) {
 ////        this.applicationService = applicationService;
@@ -110,6 +117,28 @@ public class ApplicationController {
     ){
         User applicant = userService.getUserByEmail(userDetails.getUsername());
         return ResponseEntity.ok(matchingService.calculateBreakdowns(jobId, applicant.getId()));
+    }
+
+    @GetMapping("/{applicationId}/documents/{documentId}/download")
+    public ResponseEntity<Resource> downloadApplicantDocument(@PathVariable Long applicationId,
+                                                              @PathVariable Long documentId,
+                                                              @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User employer = userService.getUserByEmail(userDetails.getUsername());
+
+        Document document = applicationService.getApplicantDocumentForEmployer(
+                applicationId,
+                documentId,
+                employer.getId()
+        );
+
+        Resource resource = fileStorageUtil.loadFileAsResource(Paths.get(document.getFilePath()).getFileName().toString());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + document.getDocumentName() + "\"")
+                .body(resource);
     }
 
 }
