@@ -8,6 +8,7 @@ import org.example.jobboard.model.Job;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,8 +21,12 @@ public class BrowseJobResponse {
     private String location;
     private Job.JobStatus status;
     private LocalDateTime createdAt;
+    private LocalDateTime expiresAt;
     private String companyName;
     private String companyWebsite;
+
+    List<JobSkillResponse> jobSkills;
+
     private BigDecimal matchScore;
     private BigDecimal skillScore;
     private BigDecimal titleScore;
