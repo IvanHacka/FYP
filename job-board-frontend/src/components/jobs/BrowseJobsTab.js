@@ -313,6 +313,12 @@ function BrowseJobsTab() {
                                         </button>
                                     </div>
 
+                                    {job.companyName && (
+                                        <div style={{ color: '#555', fontSize: '1.3rem', marginBottom: '6px' }}>
+                                            Company: {job.companyName}
+                                        </div>
+                                    )}
+
                                     <div className="job-meta">
                                         <span>✈︎ {job.location || 'Remote'} ✈︎</span>
                                         <span>$ {job.minSalary?.toLocaleString() || 'Negotiable'} $</span>
@@ -321,31 +327,27 @@ function BrowseJobsTab() {
                                     </div>
 
                                     <p className="job-description">
-                                    {job.description
-                                            ? (
-                                                job.description.length > 200 ?
-                                                    job.description.substring(0, 200) + '...' :
-                                                    job.description
-                                            )
-                                            : 'No description provided'}
+                                    {job.description ?
+                                        (
+                                            job.description.length > 200 ?
+                                                job.description.substring(0, 200) + '...' :
+                                                job.description
+                                        )
+                                        : 'No description provided'}
                                     </p>
-                                    {job.jobSkills && job.jobSkills.length > 0 && (
+                                    {job.requiredSkills && job.requiredSkills.length > 0 && (
                                         <div className="job-skills-preview">
                                             <div className="job-skills-label">Required Skills</div>
                                             <div className="job-skills-tags">
-                                                {job.jobSkills.map(skill => (
+                                                {job.requiredSkills.map(skill => (
                                                     <span key={skill.id} className="job-skill-tag">
-                                                        {skill.skillName}
+                                                        {skill.skillName} ({skill.importanceLevel} / 5)
                                                     </span>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
-                                    {job.companyName && (
-                                        <div style={{ color: '#555', fontSize: '0.9rem', marginBottom: '6px' }}>
-                                            Hiring: {job.companyName}
-                                        </div>
-                                    )}
+
                                     {job.companyWebsite && (
                                         <a
                                             href={job.companyWebsite}

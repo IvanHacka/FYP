@@ -44,7 +44,9 @@ function App() {
                 <div className="nav-right">
                   <span>Welcome, <strong>{username}</strong></span>
                   {role === 'ADMIN' && (<span className="admin-btn">Admin login</span>)}
-                  <Link to="/watchlist" className="watchlist-link" title="My Watch List">WatchList</Link>
+                  {role === 'EMPLOYEE' &&
+                      (<Link to="/watchlist" className="watchlist-link" title="My Watch List">WatchList</Link>)
+                  }
                   <Link to="/profile">My Profile</Link>
                   <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
                 </div>

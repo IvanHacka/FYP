@@ -74,7 +74,7 @@ public class ApplicationController {
 
     // GET
     // api/applications/employee
-    @GetMapping("/application/employee")
+    @GetMapping("/employee")
     public ResponseEntity<List<EmployeeApplicationResponse>> getMyApplications(
             @AuthenticationPrincipal UserDetails userDetails) {
         User applicant = userService.getUserByEmail(userDetails.getUsername());
@@ -84,7 +84,7 @@ public class ApplicationController {
 
     // PUT
     // api/{applicationId}/status
-    @PutMapping("/application/{applicationId}/status")
+    @PutMapping("/{applicationId}/status")
     public ResponseEntity<UpdateApplicationStatusResponse> updateStatus(@PathVariable Long applicationId,
                                                     @RequestBody UpdateApplicationStatusRequest request,
                                                     @AuthenticationPrincipal UserDetails userDetails) {

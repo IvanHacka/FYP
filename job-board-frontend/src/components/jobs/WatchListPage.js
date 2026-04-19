@@ -20,7 +20,7 @@ function WatchListPage() {
             setWatchList(watchRes.data || []);
 
             const appliedIds = new Set(
-                (appsRes.data || []).map(app => app.job?.id).filter(Boolean)
+                (appsRes.data || []).map(app => app.jobId).filter(Boolean)
             );
             setAppliedJobIds(appliedIds);
         } catch (error) {

@@ -9,7 +9,7 @@ import './ProfileStyle.css';
 import BasicInfoSection from "./BasicInfoSection";
 
 function ProfilePage({role}) {
-    const [activeTab, setActiveTab] = useState('basic');
+    const [activeTab, setActiveTab] = useState(role === 'EMPLOYEE'? 'basic' : 'company');
     const [completion, setCompletion] = useState(0);
     const [loading, setLoading] = useState(true);
 
@@ -87,19 +87,19 @@ function ProfilePage({role}) {
             </div>
 
             <div className="profile-content">
-                {activeTab === 'basic' && (
+                {activeTab === 'basic' && role === 'EMPLOYEE' && (
                     <BasicInfoSection onUpdate={handleProfileUpdate}/>
                 )}
-                {activeTab === 'experience' && (
+                {activeTab === 'experience' && role === 'EMPLOYEE' && (
                     <ExperienceSection onUpdate={handleProfileUpdate} />
                 )}
-                {activeTab === 'documents' && (
+                {activeTab === 'documents' && role === 'EMPLOYEE' && (
                     <DocumentsSection onUpdate={handleProfileUpdate} />
                 )}
-                {activeTab === 'skills' && (
+                {activeTab === 'skills' && role === 'EMPLOYEE' && (
                     <SkillsSection onUpdate={handleProfileUpdate} />
                 )}
-                {activeTab === 'company' && (
+                {activeTab === 'company' && role === 'EMPLOYER' && (
                     <CompanyProfileSection onUpdate={handleProfileUpdate} />
                 )}
             </div>
