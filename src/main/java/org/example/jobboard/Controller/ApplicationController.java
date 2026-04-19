@@ -141,5 +141,17 @@ public class ApplicationController {
                 .body(resource);
     }
 
+
+    // GET
+    // api/{applicationId}/timeline
+    @GetMapping("/{applicationId}/timeline")
+    public ResponseEntity<List<ApplicationStatusHistoryResponse>> getApplicationTimeline(
+            @PathVariable Long applicationId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(applicationService.getApplicationTimeline(applicationId, user.getId(), user.getRole()));
+    }
+
 }
 

@@ -335,11 +335,11 @@ function BrowseJobsTab() {
                                         )
                                         : 'No description provided'}
                                     </p>
-                                    {job.requiredSkills && job.requiredSkills.length > 0 && (
+                                    {job.jobSkills && job.jobSkills.length > 0 && (
                                         <div className="job-skills-preview">
                                             <div className="job-skills-label">Required Skills</div>
                                             <div className="job-skills-tags">
-                                                {job.requiredSkills.map(skill => (
+                                                {job.jobSkills.map(skill => (
                                                     <span key={skill.id} className="job-skill-tag">
                                                         {skill.skillName} ({skill.importanceLevel} / 5)
                                                     </span>

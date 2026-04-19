@@ -238,6 +238,16 @@ function MyJobsTab() {
             console.log('Application id is missing');
             return;
         }
+
+        const confirmMessage =
+            status === 'REJECTED' ?
+                'Are you sure you want to reject this applicant?' :
+                status === 'ACCEPTED' ?
+                    'Are you sure you want to accept this applicant?' :
+                    null;
+
+        if (confirmMessage && !window.confirm(confirmMessage)) return;
+
         const employerNotes = employerNotesByApplication[applicationId] || '';
         try {
             const res = await updateApplicationStatus(applicationId, status, employerNotes);
@@ -632,57 +642,100 @@ function MyJobsTab() {
                                                             </div>
                                                         </div>
 
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            gap: '8px',
-                                                            flexWrap: 'wrap',
-                                                            alignItems: 'flex-start'
-                                                        }}>
-                                                            <button
-                                                                className="btn btn-outline btn-sm"
-                                                                onClick={() => toggleApplicantDetails(app.applicationId)}
-                                                            >
-                                                                {showApplicantDetails[app.applicationId] ? 'Hide Details' : 'View Details'}
-                                                            </button>
+                                                                <div style={{
+                                                                    display: 'flex',
+                                                                    gap: '8px',
+                                                                    flexWrap: 'wrap',
+                                                                    alignItems: 'flex-start'
+                                                                }}>
+                                                                    <button
+                                                                        className="btn btn-outline btn-sm"
+                                                                        onClick={() => toggleApplicantDetails(app.applicationId)}
+                                                                    >
+                                                                        {showApplicantDetails[app.applicationId] ? 'Hide Details' : 'View Details'}
+                                                                    </button>
 
-                                                            <button
-                                                                className="btn btn-outline btn-sm"
-                                                                onClick={() => handleSaveEmployerNotes(app.applicationId, app.status || 'SUBMITTED')}
-                                                            >
-                                                                Save Notes
-                                                            </button>
+                                                                    <button
+                                                                        className="btn btn-outline btn-sm"
+                                                                        onClick={() => handleSaveEmployerNotes(app.applicationId, app.status || 'SUBMITTED')}
+                                                                    >
+                                                                        Save Notes
+                                                                    </button>
 
-                                                            <button
-                                                                className="btn btn-outline btn-sm"
-                                                                onClick={() => handleApplicationStatusChange(app.applicationId, 'SHORTLISTED')}
-                                                                disabled={app.status === 'SHORTLISTED'}
-                                                            >
-                                                                Shortlist
-                                                            </button>
+                                                                    <div style={{
+                                                                        display: 'flex',
+                                                                        gap: '8px',
+                                                                        flexWrap: 'wrap',
+                                                                        marginTop: '10px'
+                                                                    }}>
 
-                                                            <button
-                                                                className="btn btn-outline btn-sm"
-                                                                onClick={() => handleApplicationStatusChange(app.applicationId, 'REJECTED')}
-                                                                disabled={app.status === 'REJECTED'}
-                                                            >
-                                                                Reject
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                                        {app.status === 'SUBMITTED' && (
+                                                                            <button
+                                                                                className="btn btn-outline btn-sm"
+                                                                                onClick={() => handleApplicationStatusChange(app.applicationId, 'UNDER_REVIEW')}
+                                                                            >
+                                                                                Review
+                                                                            </button>
+                                                                        )}
 
-                                                    {showApplicantDetails[app.applicationId] && (
-                                                        <div className="detail-box" style={{marginTop: '12px'}}>
-                                                            {app.reviewedAt && (
-                                                                <div style={{color: '#666', fontSize: '0.85rem'}}>
-                                                                    Reviewed: {new Date(app.reviewedAt).toLocaleString()}
+                                                                        {(app.status === 'SUBMITTED' || app.status === 'UNDER_REVIEW') && (
+                                                                            <>
+                                                                                <button
+                                                                                    className="btn btn-outline btn-sm"
+                                                                                    onClick={() => handleApplicationStatusChange(app.applicationId, 'SHORTLISTED')}
+                                                                                >
+                                                                                    Shortlist
+                                                                                </button>
+
+                                                                                <button
+                                                                                    className="btn btn-outline btn-sm"
+                                                                                    onClick={() => handleApplicationStatusChange(app.applicationId, 'REJECTED')}
+                                                                                >
+                                                                                    Reject
+                                                                                </button>
+                                                                            </>
+                                                                        )}
+
+                                                                        {app.status === 'SHORTLISTED' && (
+                                                                            <button
+                                                                                className="btn btn-primary btn-sm"
+                                                                                onClick={() => handleApplicationStatusChange(app.applicationId, 'ACCEPTED')}
+                                                                            >
+                                                                                Accept
+                                                                            </button>
+                                                                        )}
+
+
+                                                                        {/* reversible (Not fully) */}
+                                                                        {/* One step back */}
+                                                                        {(app.status === 'UNDER_REVIEW' || app.status === 'SHORTLISTED' || app.status === 'REJECTED') && (
+                                                                            <button
+                                                                                className="btn btn-outline btn-sm"
+                                                                                onClick={() => handleApplicationStatusChange(app.applicationId, 'UNDER_REVIEW')}
+                                                                            >
+                                                                                Move Back to Review
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                            )}
+                                                            </div>
 
-                                                            {app.whyGoodFit && (
-                                                                <div style={{marginTop: '10px'}}>
-                                                                    <strong>Why good fit</strong>
-                                                                    <div>{app.whyGoodFit}</div>
-                                                                </div>
+                                                            {showApplicantDetails[app.applicationId] && (
+                                                                <div className="detail-box" style={{marginTop: '12px'}}>
+                                                                    {app.reviewedAt && (
+                                                                        <div style={{
+                                                                            color: '#666',
+                                                                            fontSize: '0.85rem'
+                                                                        }}>
+                                                                            Reviewed: {new Date(app.reviewedAt).toLocaleString()}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {app.whyGoodFit && (
+                                                                        <div style={{marginTop: '10px'}}>
+                                                                            <strong>Why good fit</strong>
+                                                                            <div>{app.whyGoodFit}</div>
+                                                                        </div>
                                                             )}
 
                                                             {(app.expectedSalary || app.availableStartDate) && (
@@ -722,20 +775,105 @@ function MyJobsTab() {
                                                                 </div>
                                                             )}
 
-                                                            <div style={{marginTop: '10px'}}>
-                                                                <textarea
-                                                                    className="form-control"
-                                                                    rows="3"
-                                                                    placeholder="Notes to employee"
-                                                                    value={employerNotesByApplication[app.applicationId] ?? app.employerNotes ?? ''}
-                                                                    onChange={(e) =>
-                                                                        setEmployerNotesByApplication(prev => ({
-                                                                            ...prev,
-                                                                            [app.applicationId]: e.target.value
-                                                                        }))
-                                                                    }
-                                                                />
-                                                            </div>
+
+                                                            {showApplicantDetails[app.applicationId] && (
+                                                                <div className="detail-box" style={{marginTop: '12px'}}>
+                                                                    <div style={{color: '#666', fontSize: '0.85rem'}}>
+                                                                        <div>Skills: {app.skillScore ?? 'N/A'}%</div>
+                                                                        <div>Title: {app.titleScore ?? 'N/A'}%</div>
+                                                                        <div>Location: {app.locationScore ?? 'N/A'}%</div>
+                                                                        <div>Salary: {app.salaryScore ?? 'N/A'}%</div>
+                                                                        <div>Type: {app.jobTypeScore ?? 'N/A'}%</div>
+                                                                    </div>
+
+                                                                    {app.whyGoodFit && (
+                                                                        <div style={{marginTop: '12px'}}>
+                                                                            <strong>Why Good Fit</strong>
+                                                                            <div style={{marginTop: '4px', color: '#444'}}>
+                                                                                {app.whyGoodFit}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {(app.expectedSalary || app.availableStartDate) && (
+                                                                        <div style={{marginTop: '12px', color: '#666', fontSize: '0.85rem'}}>
+                                                                            {app.expectedSalary && (
+                                                                                <div>
+                                                                                    Expected Salary: ${Number(app.expectedSalary).toLocaleString()}
+                                                                                </div>
+                                                                            )}
+                                                                            {app.availableStartDate && (
+                                                                                <div>
+                                                                                    Available Start Date: {new Date(app.availableStartDate).toLocaleDateString()}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {app.applicantBio && (
+                                                                        <div style={{marginTop: '12px'}}>
+                                                                            <strong>Profile Summary</strong>
+                                                                            <div style={{marginTop: '4px', color: '#444'}}>
+                                                                                {app.applicantBio}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {(app.applicantLinkedinUrl || app.applicantPortfolioUrl) && (
+                                                                        <div
+                                                                            style={{
+                                                                                marginTop: '12px',
+                                                                                display: 'flex',
+                                                                                gap: '10px',
+                                                                                flexWrap: 'wrap'
+                                                                            }}
+                                                                        >
+                                                                            {app.applicantLinkedinUrl && (
+                                                                                <a
+                                                                                    href={app.applicantLinkedinUrl}
+                                                                                    target="_blank"
+                                                                                    rel="noreferrer"
+                                                                                    className="btn btn-outline btn-sm"
+                                                                                >
+                                                                                    LinkedIn
+                                                                                </a>
+                                                                            )}
+
+                                                                            {app.applicantPortfolioUrl && (
+                                                                                <a
+                                                                                    href={app.applicantPortfolioUrl}
+                                                                                    target="_blank"
+                                                                                    rel="noreferrer"
+                                                                                    className="btn btn-outline btn-sm"
+                                                                                >
+                                                                                    Portfolio
+                                                                                </a>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div style={{marginTop: '12px'}}>
+                                                                        <textarea
+                                                                            className="form-control"
+                                                                            rows="4"
+                                                                            placeholder="Notes to employee"
+                                                                            value={employerNotesByApplication[app.applicationId] ?? app.employerNotes ?? ''}
+                                                                            onChange={(e) =>
+                                                                                setEmployerNotesByApplication(prev => ({
+                                                                                    ...prev,
+                                                                                    [app.applicationId]: e.target.value
+                                                                                }))
+                                                                            }
+                                                                        />
+                                                                    </div>
+
+                                                                    {app.employerNotes && (
+                                                                        <div style={{marginTop: '8px', color: '#555', fontSize: '0.85rem'}}>
+                                                                            Current Notes: {app.employerNotes}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </li>
@@ -756,3 +894,8 @@ function MyJobsTab() {
 }
 
 export default MyJobsTab;
+
+
+
+
+

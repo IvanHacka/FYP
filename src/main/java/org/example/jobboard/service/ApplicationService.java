@@ -3,14 +3,8 @@ package org.example.jobboard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.*;
-import org.example.jobboard.model.Application;
-import org.example.jobboard.model.Document;
-import org.example.jobboard.model.Job;
-import org.example.jobboard.model.User;
-import org.example.jobboard.repo.ApplicationRepo;
-import org.example.jobboard.repo.DocumentRepo;
-import org.example.jobboard.repo.JobRepo;
-import org.example.jobboard.repo.UserRepo;
+import org.example.jobboard.model.*;
+import org.example.jobboard.repo.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +19,7 @@ public class ApplicationService {
     private final UserRepo userRepo;
     private final MatchingService matchingService;
     private final DocumentRepo documentRepo;
+    private final ApplicationStatusHistoryRepo applicationStatusHistoryRepo;
 
     public Application jobApply(Long jobId, Long userId, String whyGoodFit,
                                 BigDecimal expectedSalary, LocalDate availableStartDate) {
@@ -69,16 +64,47 @@ public class ApplicationService {
 
     public List<EmployeeApplicationResponse> getMyApplications(Long applicantId) {
         return applicationRepo.findByApplicantIdOrderByCreatedAtDesc(applicantId)
-                .stream().map(app -> EmployeeApplicationResponse.builder()
-                        .applicationId(app.getId())
-                        .jobId(app.getJob().getId())
-                        .jobTitle(app.getJob().getTitle())
-                        .status(app.getStatus().name())
-                        .employerNotes(app.getEmployerNotes())
-                        .reviewedAt(app.getReviewedAt())
-                        .createdAt(app.getCreatedAt())
-                        .matchScore(app.getMatchScore())
-                        .build())
+                .stream().map(app ->{
+                    MatchScoreBreakdownRequest breakdowns = matchingService.calculateBreakdowns(
+                        app.getJob().getId(),
+                        app.getApplicant().getId()
+                    );
+
+                    return EmployeeApplicationResponse.builder()
+                    .applicationId(app.getId())
+                    .jobId(app.getJob() != null ? app.getJob().getId() : null)
+                    .jobTitle(app.getJob() != null ? app.getJob().getTitle() : null)
+
+                    .status(app.getStatus() != null ? app.getStatus().name() : null)
+                    .employerNotes(app.getEmployerNotes())
+                    .reviewedAt(app.getReviewedAt())
+                    .createdAt(app.getCreatedAt())
+                    .matchScore(breakdowns.getFinalScore())
+                    .skillScore(breakdowns.getSkillScore())
+                    .salaryScore(breakdowns.getSalaryScore())
+                    .locationScore(breakdowns.getLocationScore())
+                    .titleScore(breakdowns.getTitleScore())
+                    .jobTypeScore(breakdowns.getJobTypeScore())
+
+                    .whyGoodFit(app.getWhyGoodFit())
+                    .expectedSalary(app.getExpectedSalary())
+                    .availableStartDate(app.getAvailableStartDate())
+
+                    .companyName(
+                            app.getJob() != null && app.getJob().getEmployer() != null ?
+                                    app.getJob().getEmployer().getCompanyName() :
+                                    null
+                    )
+                    .companyWebsite(
+                            app.getJob() != null && app.getJob().getEmployer() != null ?
+                                    app.getJob().getEmployer().getCompanyWebsite() :
+                                    null
+                    )
+                    .jobLocation(app.getJob() != null ? app.getJob().getLocation() : null)
+                    .jobMinSalary(app.getJob() != null ? app.getJob().getMinSalary() : null)
+                    .jobDescription(app.getJob() != null ? app.getJob().getDescription() : null)
+                    .build();
+                })
                 .toList();
     }
 
@@ -113,9 +139,9 @@ public class ApplicationService {
 //                                            : List.of()
 //                            )
                             .applicantDocuments(
-                                    app.getApplicant() != null
-                                            ? mapApplicantDocuments(app.getApplicant().getId())
-                                            : List.of()
+                                    app.getApplicant() != null ?
+                                            mapApplicantDocuments(app.getApplicant().getId()) :
+                                            List.of()
                             )
                             .status(app.getStatus() != null ? app.getStatus().name() : null)
                             .employerNotes(app.getEmployerNotes())
@@ -189,25 +215,61 @@ public class ApplicationService {
                 .toList();
     }
 
-
     public UpdateApplicationStatusResponse updateApplicationStatus(Long applicationId, Long employerId,
                                                                    Application.ApplicationStatus status,
-                                                                   String employerNotes) {
+                                                                   String employerNotes)
+    {
         Application application = applicationRepo.findByIdAndJobEmployerId(applicationId, employerId)
                 .orElseThrow(() -> new RuntimeException("Application not found or access denied"));
+
+        Application.ApplicationStatus oldStatus = application.getStatus();
 
         application.setStatus(status);
         application.setEmployerNotes(employerNotes);
         application.setReviewedAt(java.time.LocalDateTime.now());
 
-        Application savedApplication = applicationRepo.save(application);
+        Application saved = applicationRepo.save(application);
+
+        ApplicationStatusHistory history = ApplicationStatusHistory.builder()
+                .application(saved)
+                .oldStatus(oldStatus)
+                .newStatus(saved.getStatus())
+                .employerNotes(employerNotes)
+                .build();
+
+        applicationStatusHistoryRepo.save(history);
 
         return UpdateApplicationStatusResponse.builder()
-                .applicationId(savedApplication.getId())
-                .status(savedApplication.getStatus().name())
-                .employerNotes(savedApplication.getEmployerNotes())
-                .reviewedAt(savedApplication.getReviewedAt())
+                .applicationId(saved.getId())
+                .status(saved.getStatus().name())
+                .employerNotes(saved.getEmployerNotes())
+                .reviewedAt(saved.getReviewedAt())
                 .build();
+    }
+
+    public List<ApplicationStatusHistoryResponse> getApplicationTimeline(Long applicationId, Long userId, User.Role role) {
+        Application application;
+
+        if (role == User.Role.EMPLOYER) {
+            application = applicationRepo.findByIdAndJobEmployerId(applicationId, userId)
+                    .orElseThrow(() -> new RuntimeException("Application not found or access denied"));
+        } else if (role == User.Role.EMPLOYEE) {
+            application = applicationRepo.findByIdAndApplicantId(applicationId, userId)
+                    .orElseThrow(() -> new RuntimeException("Application not found or access denied"));
+        } else {
+            throw new RuntimeException("Access denied");
+        }
+
+        return applicationStatusHistoryRepo.findByApplicationIdOrderByChangedAtAsc(application.getId())
+                .stream()
+                .map(h -> ApplicationStatusHistoryResponse.builder()
+                        .id(h.getId())
+                        .oldStatus(h.getOldStatus() != null ? h.getOldStatus().name() : null)
+                        .newStatus(h.getNewStatus() != null ? h.getNewStatus().name() : null)
+                        .employerNotes(h.getEmployerNotes())
+                        .changedAt(h.getChangedAt())
+                        .build())
+                .toList();
     }
 
     public Application withdrawApplication(Long applicationId, Long applicantId) {
@@ -242,5 +304,6 @@ public class ApplicationService {
         return documentRepo.findByIdAndUserId(documentId, applicantId).orElseThrow(
                 () -> new RuntimeException("Document not found or access denied"));
     }
+
 
 }

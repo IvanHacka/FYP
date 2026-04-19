@@ -4,6 +4,7 @@ import { getEmployeeApplications, withdrawApplication } from "../../api/api";
 function MyApplications() {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showDetails, setShowDetails] = useState({});
 
     useEffect(() => {
         loadApplications();
@@ -36,6 +37,58 @@ function MyApplications() {
         } catch (error) {
             console.error('Withdraw failed', error);
         }
+    };
+    const toggleDetails = (applicationId) => {
+        setShowDetails(prev => ({
+            ...prev,
+            [applicationId]: !prev[applicationId]
+        }));
+    };
+    const buildTimeline = (app) => {
+        const timeline = [];
+
+        // Always exists
+        timeline.push({
+            label: 'Application Submitted',
+            date: app.createdAt
+        });
+
+        if (app.status !== 'SUBMITTED') {
+            timeline.push({
+                label: 'Under Review',
+                date: app.reviewedAt || app.createdAt
+            });
+        }
+
+        if (app.status === 'SHORTLISTED') {
+            timeline.push({
+                label: 'Shortlisted',
+                date: app.reviewedAt
+            });
+        }
+
+        if (app.status === 'REJECTED') {
+            timeline.push({
+                label: 'Rejected',
+                date: app.reviewedAt
+            });
+        }
+
+        if (app.status === 'ACCEPTED') {
+            timeline.push({
+                label: 'Accepted',
+                date: app.reviewedAt
+            });
+        }
+
+        if (app.status === 'WITHDRAWN') {
+            timeline.push({
+                label: 'Withdrawn',
+                date: new Date().toISOString()
+            });
+        }
+
+        return timeline;
     };
 
     if (loading) {
@@ -82,11 +135,16 @@ function MyApplications() {
                                         Applied: {app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Unknown date'}
                                     </span>
                                 </div>
+                                {app.reviewedAt && (
+                                    <div style={{ marginTop: '8px', fontSize: '0.85rem', color: '#666' }}>
+                                        Reviewed: {new Date(app.reviewedAt).toLocaleString()}
+                                    </div>
+                                )}
 
                                 <div className="job-match-score">
-                                    {app.matchScore != null
-                                        ? `Match Score: ${Number(app.matchScore).toFixed(2)}%`
-                                        : 'Match score unavailable'}
+                                    {app.matchScore != null ?
+                                        `Match Score: ${Number(app.matchScore).toFixed(2)}%` :
+                                        'Match score unavailable'}
                                 </div>
 
                                 {app.employerNotes && (
@@ -96,16 +154,17 @@ function MyApplications() {
                                     </div>
                                 )}
 
-                                {app.reviewedAt && (
-                                    <div style={{ marginTop: '8px', fontSize: '0.85rem', color: '#666' }}>
-                                        Reviewed: {new Date(app.reviewedAt).toLocaleString()}
-                                    </div>
-                                )}
 
                                 <div
                                     className="job-actions"
-                                    style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '12px' }}
+                                    style={{display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '12px'}}
                                 >
+                                    <button
+                                        className="btn btn-outline btn-sm"
+                                        onClick={() => toggleDetails(app.applicationId)}
+                                    >
+                                        {showDetails[app.applicationId] ? 'Hide Details' : 'View Details'}
+                                    </button>
                                     {(app.status !== 'ACCEPTED' &&
                                         app.status !== 'REJECTED' &&
                                         app.status !== 'WITHDRAWN') && (
@@ -117,6 +176,75 @@ function MyApplications() {
                                         </button>
                                     )}
                                 </div>
+                                {showDetails[app.applicationId] && (
+                                    <div className="detail-box" style={{ marginTop: '12px' }}>
+
+                                        {/* score breakdown */}
+                                        {(app.skillScore || app.salaryScore || app.locationScore) && (
+                                            <>
+                                                <h4>Match Breakdown</h4>
+                                                <div style={{ fontSize: '0.9rem', color: '#555' }}>
+                                                    <div>Skills: {app.skillScore ?? 'N/A'}%</div>
+                                                    <div>Title: {app.titleScore ?? 'N/A'}%</div>
+                                                    <div>Location: {app.locationScore ?? 'N/A'}%</div>
+                                                    <div>Salary: {app.salaryScore ?? 'N/A'}%</div>
+                                                    <div>Job Type: {app.jobTypeScore ?? 'N/A'}%</div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {/* Input preferences */}
+                                        {(app.whyGoodFit || app.expectedSalary || app.availableStartDate) && (
+                                            <>
+                                                <h4 style={{ marginTop: '12px' }}>Your Application</h4>
+
+                                                {app.whyGoodFit && (
+                                                    <div>
+                                                        <strong>Why you’re a good fit:</strong>
+                                                        <p>{app.whyGoodFit}</p>
+                                                    </div>
+                                                )}
+
+                                                {(app.expectedSalary || app.availableStartDate) && (
+                                                    <div style={{ fontSize: '0.9rem', color: '#555' }}>
+                                                        {app.expectedSalary && (
+                                                            <div>Expected Salary: ${Number(app.expectedSalary).toLocaleString()}</div>
+                                                        )}
+                                                        {app.availableStartDate && (
+                                                            <div>Available Start Date: {new Date(app.availableStartDate).toLocaleDateString()}</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {/* History time line */}
+                                        <div style={{ marginTop: '16px' }}>
+                                            <h4>Application Timeline</h4>
+
+                                            <ul style={{
+                                                listStyle: 'none',
+                                                padding: 0,
+                                                marginTop: '8px'
+                                            }}>
+                                                {buildTimeline(app).map((item, index) => (
+                                                    <li key={index} style={{
+                                                        padding: '8px 0',
+                                                        borderLeft: '3px solid #2563eb',
+                                                        paddingLeft: '10px',
+                                                        marginBottom: '6px'
+                                                    }}>
+                                                        <div style={{ fontWeight: 600 }}>{item.label}</div>
+                                                        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                                                            {item.date ? new Date(item.date).toLocaleString() : '—'}
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                )}
                             </div>
                         </li>
                     ))}
