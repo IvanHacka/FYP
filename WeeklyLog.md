@@ -1,70 +1,258 @@
 # Weekly Log (What I did, What I will do, Blockers)
 ---------------------------------------------------
 
-## Week 14
+## Week 1
 **What I did this week:**
-- Implemented job expiry feature in backend (added `expiresAt` field in Job entity).
-- Updated frontend to display job expiry date clearly in employer view.
-- Adjusted job status logic to reflect expiry (OPEN vs EXPIRED).
-- Began integrating expiry handling into existing job lifecycle.
+- Started the project and interpreted it as an **employer focused job board system**.
+- Planned core features mainly around employer-side functionality.
+- Designed initial system structure.
 
-**What to do next week:**
-- Improve employee application tracking interface.
-- Implement better status visibility for applications.
+**What I plan to do :**
+- Implement employer-focused features.
+- Explore extracting logic.
 
 **Blockers:**
-- Some inconsistencies between job status and expiry logic during display.
+- None.
+
+---------------------------------------------------
+
+## Week 2
+**What I did this week:**
+- Continued developing employer-centric system features.
+
+**What I plan to do :**
+- Integrate spring security and employer view.
+- Expand functionality.
+
+**Blockers:**
+- Difficulty defining effective keyword extraction rules.
+
+---------------------------------------------------
+
+## Week 3
+**What I did this week:**
+- Began implementing keyword extraction logic from job titles and descriptions.
+- Revisited project requirements and realised the system should support **both employees and employers**.
+- Identified that current implementation was misaligned.
+- Analyse what can be reused.
+- Decided to **restart and redesign the system architecture**.
+
+**What I plan to do :**
+- Redesign system structure and database.
+- Rebuild project with correct scope.
+
+**Blockers:**
+- Need to discard earlier implementation.
+
+---------------------------------------------------
+
+## Week 4
+**What I did this week:**
+- Redesigned database schema (User, Job, Application).
+- Refine backend structure and relationships.
+- Prepared system for both roles based system.
+
+**What I plan to do :**
+- Reimplement authentication system.
+
+**Blockers:**
+- None.
+
+---------------------------------------------------
+
+## Week 5
+**What I did this week:**
+- Reimplemented authentication (Spring security).
+- Fixed previous login issue.
+- Ensured role-based access control.
+
+**What I plan to do :**
+- Build profile features.
+
+**Blockers:**
+- None.
+
+---------------------------------------------------
+
+## Week 6
+**What I did this week:**
+- Rebuilt employee and employer profile features.
+- Set up React to connect frontend with backend APIs.
+- Added some validation.
+
+**What I plan to do :**
+- Implement job posting and browsing.
+
+**Blockers:**
+- None.
+
+---------------------------------------------------
+
+## Week 7
+**What I did this week:**
+- Implemented job posting.
+- Built job browsing and search features.
+- Integrated job cards to frontend.
+
+**What I plan to do :**
+- Improve application flow.
+
+**Blockers:**
+- None.
+
+---------------------------------------------------
+
+## Week 8
+**What I did this week:**
+- Reworked job application logic.
+- Prevented duplicate applications.
+- Improved backend validation.
+
+**What I plan to do :**
+- Add watch list feature.
+
+**Blockers:**
+- None.
+
+---------------------------------------------------
+
+## Week 9
+**What I did this week:**
+- Implemented watch list feature (save jobs).
+- Improved employee side interaction.
+
+**What I plan to do :**
+- Implement matching system.
+
+**Blockers:**
+- None.
+
+---------------------------------------------------
+
+## Week 10
+**What I did this week:**
+- Implemented match score logic.
+- Integrated scoring into application responses.
+
+**What I plan to do :**
+- Add employer job skill management.
+- Added score breakdown (skills, title, location, salary, job type) not just final matchscore.
+
+**Blockers:**
+- Difficulty tuning scoring weights.
+- Match score breakdown requires to rebuild backend logic.
+
+---------------------------------------------------
+
+## Week 11
+**What I did this week:**
+- Implemented job skill management for employers.
+- Added create/update/delete job skills for job posts.
+- Added employer notes creation and showing on employee side.
+- Improved data handling with DTO.
+
+**What I plan to do :**
+- Improve application review flow.
+
+**Blockers:**
+- Data flow inconsistencies.
+
+---------------------------------------------------
+
+## Week 12
+**What I did this week:**
+- Improved data flow by adding DTO.
+- Implemented application status updates (review, shortlist, reject...).
+- Added employer controls for application status.
+- Started building application timeline.
+
+**What I plan to do :**
+- Implement document handling.
+
+**Blockers:**
+- Parameter mismatch.
+
+---------------------------------------------------
+
+## Week 13
+**What I did this week:**
+- Implemented document download logic for employer.
+- Enabled employee document download.
+- Began employer document access.
+
+**What I plan to do :**
+- Fix employer document handling.
+
+**Blockers:**
+- Employer download not working correctly.
+
+---------------------------------------------------
+
+## Week 14
+**What I did this week:**
+- Fixed employer document download issues.
+- Extended employer access to all applicant documents.
+- Improved applicant visibility.
+
+**What I plan to do :**
+- Refine application flow.
+
+**Blockers:**
+- File handling inconsistencies.
 
 ---------------------------------------------------
 
 ## Week 15
 **What I did this week:**
-- Improved “My Applications” page on employee side.
-- Implemented application withdrawal functionality.
-- Started building application timeline UI (submitted, under review, etc.).
-- Connected timeline display with backend timestamps.
+- Refactored application process to include job specific preferences inputs.
+- Added validation for preferences input.
+- Improved input handling.
 
-**What to do next week:**
-- Fix missing or incorrect timeline data.
-- Ensure all status timestamps are correctly stored and returned.
+**What I plan to do :**
+- Implement job expiry.
 
 **Blockers:**
-- Timeline only showing partial data due to missing fields in database.
+- Validation errors not displaying initially.
 
 ---------------------------------------------------
 
 ## Week 16
 **What I did this week:**
-- Fixed DTO issues where application fields were not returning properly.
-- Debugged and corrected timeline logic (old vs new status conflicts).
-- Resolved incorrect timestamps being displayed on frontend.
-- Fixed parameter issues causing errors (e.g. undefined IDs in requests).
-- Improved consistency between backend response and frontend rendering.
+- Implemented job expiry feature `expiresAt`.
+- Updated job lifecycle handling.
+- Displayed expiry in frontend.
 
-**What to do next week:**
-- Finalise application flow and improve employer review features.
-- Ensure document handling works for both employee and employer.
+**What I plan to do :**
+- Improve application tracking.
 
 **Blockers:**
-- Data inconsistency between old and newly introduced fields required debugging.
+- Status vs expiry inconsistency.
 
 ---------------------------------------------------
 
-## Week 17 (Current)
+## Week 17
 **What I did this week:**
-- Fixed employer-side document download issues (aligned with employee download logic).
-- Extended employer access to view more applicant documents, not just CV.
-- Updated application flow to support job-specific inputs (e.g. why good fit, expected salary).
-- Refined validation logic (e.g. expected salary must be valid).
-- Verified end-to-end flow: apply → review → status update → document access.
+- Improved “My Applications” page.
+- Implemented withdrawal feature.
+- Built application timeline UI.
 
-**What to do next week:**
-- Begin full system testing (functional, integration, and user testing).
-- Start writing testing chapter and evaluation for dissertation.
+**What I plan to do :**
+- Fix timeline data issues.
 
 **Blockers:**
-- Some data may not exist in database yet, affecting testing of full timeline scenarios.
-- Finish writing testing chapter and documentation.
+- Missing timestamp data.
+
+---------------------------------------------------
+
+## Week 18
+**What I did this week:**
+- Fixed DTO issues and added missing fields.
+- Corrected timeline logic and added timestamps.
+- Resolved frontend/backend inconsistencies.
+- Verified full system workflow end-to-end.
+
+**What I plan to do :**
+- Conduct testing and begin dissertation writing.
 
 **Blockers:**
-- None.
+- Some test data missing for full timeline scenarios.
