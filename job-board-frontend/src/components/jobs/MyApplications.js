@@ -47,46 +47,26 @@ function MyApplications() {
     const buildTimeline = (app) => {
         const timeline = [];
 
-        // Always exists
-        timeline.push({
-            label: 'Application Submitted',
-            date: app.createdAt
-        });
-
-        if (app.status !== 'SUBMITTED') {
-            timeline.push({
-                label: 'Under Review',
-                date: app.reviewedAt || app.createdAt
-            });
+        if (app.createdAt) {
+            timeline.push({ label: 'Application Submitted', date: app.createdAt});
         }
 
-        if (app.status === 'SHORTLISTED') {
-            timeline.push({
-                label: 'Shortlisted',
-                date: app.reviewedAt
-            });
+        if (app.reviewedAt) {
+            timeline.push({ label: 'Under Review', date: app.reviewedAt});
         }
 
-        if (app.status === 'REJECTED') {
-            timeline.push({
-                label: 'Rejected',
-                date: app.reviewedAt
-            });
+        if (app.shortlistedAt) {
+            timeline.push({ label: 'Shortlisted', date: app.shortlistedAt});
         }
 
-        if (app.status === 'ACCEPTED') {
-            timeline.push({
-                label: 'Accepted',
-                date: app.reviewedAt
-            });
+        if (app.rejectedAt) {
+            timeline.push({ label: 'Rejected', date: app.rejectedAt });
         }
 
-        if (app.status === 'WITHDRAWN') {
-            timeline.push({
-                label: 'Withdrawn',
-                date: new Date().toISOString()
-            });
+        if (app.acceptedAt) {
+            timeline.push({ label: 'Rejected', date: app.acceptedAt });
         }
+
 
         return timeline;
     };
@@ -179,6 +159,43 @@ function MyApplications() {
                                 {showDetails[app.applicationId] && (
                                     <div className="detail-box" style={{ marginTop: '12px' }}>
 
+                                        {/* Company details */}
+                                        {(app.companyName || app.companyWebsite || app.companyDescription) && (
+                                            <div className="detail-box" style={{ marginBottom: '12px' }}>
+                                                <h4>Company Profile</h4>
+
+                                                {app.companyName && (
+                                                    <div><strong>Company Name:</strong> {app.companyName}</div>
+                                                )}
+
+                                                {app.companyWebsite && (
+                                                    <div>
+                                                        <strong>Website:</strong>{' '}
+                                                        <a
+                                                            href={app.companyWebsite}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                        >
+                                                            {app.companyWebsite}
+                                                        </a>
+                                                    </div>
+                                                )}
+
+                                                {app.minSalary && (
+                                                    <div>
+                                                        Salary: ${Number(app.minSalary).toLocaleString()}
+                                                    </div>
+                                                )}
+
+                                                {app.companyDescription && (
+                                                    <div style={{ marginTop: '8px' }}>
+                                                        <strong>About:</strong>
+                                                        <p style={{ marginTop: '4px' }}>{app.companyDescription}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
                                         {/* score breakdown */}
                                         {(app.skillScore || app.salaryScore || app.locationScore) && (
                                             <>
@@ -228,13 +245,17 @@ function MyApplications() {
                                                 marginTop: '8px'
                                             }}>
                                                 {buildTimeline(app).map((item, index) => (
-                                                    <li key={index} style={{
-                                                        padding: '8px 0',
-                                                        borderLeft: '3px solid #2563eb',
-                                                        paddingLeft: '10px',
-                                                        marginBottom: '6px'
-                                                    }}>
+                                                    <li
+                                                        key={index}
+                                                        style={{
+                                                            padding: '8px 0',
+                                                            borderLeft: '3px solid #2563eb',
+                                                            paddingLeft: '10px',
+                                                            marginBottom: '6px'
+                                                        }}
+                                                    >
                                                         <div style={{ fontWeight: 600 }}>{item.label}</div>
+
                                                         <div style={{ fontSize: '0.8rem', color: '#666' }}>
                                                             {item.date ? new Date(item.date).toLocaleString() : '—'}
                                                         </div>

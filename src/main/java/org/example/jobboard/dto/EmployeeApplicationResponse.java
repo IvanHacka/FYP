@@ -19,8 +19,12 @@ public class EmployeeApplicationResponse {
 
     private String status;
     private String employerNotes;
-    private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
+    private LocalDateTime reviewedAt;
+    private LocalDateTime shortlistedAt;
+    private LocalDateTime rejectedAt;
+    private LocalDateTime acceptedAt;
+    private LocalDateTime withdrawnAt;
 
     private BigDecimal matchScore;
     private BigDecimal skillScore;

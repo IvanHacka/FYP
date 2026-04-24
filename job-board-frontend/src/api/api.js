@@ -211,6 +211,10 @@ export const downloadApplicationDocumentsForEmployer = (applicationId, documentI
     });
 }
 
+export const getApplicationTimeline = (applicationId) => {
+    return api.get(`/applications/${applicationId}/timeline`);
+};
+
 // admin
 export const fetchPendingEmployers = () => {
     return api.get('/admin/pending');

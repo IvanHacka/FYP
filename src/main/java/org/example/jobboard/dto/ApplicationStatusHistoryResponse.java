@@ -17,4 +17,11 @@ public class ApplicationStatusHistoryResponse {
     private String newStatus;
     private String employerNotes;
     private LocalDateTime changedAt;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime reviewedAt;
+    private LocalDateTime shortlistedAt;
+    private LocalDateTime rejectedAt;
+    private LocalDateTime acceptedAt;
+    private LocalDateTime withdrawnAt;
 }

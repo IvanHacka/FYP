@@ -67,6 +67,18 @@ public class Application {
     @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
 
+    @Column(name = "shortlisted_at")
+    private LocalDateTime shortlistedAt;
+
+    @Column(name = "rejected_at")
+    private LocalDateTime rejectedAt;
+
+    @Column(name = "accepted_at")
+    private LocalDateTime acceptedAt;
+
+    @Column(name = "withdrawn_at")
+    private LocalDateTime withdrawnAt;
+
     // might send a form or a invitation if shortlisted ?
     public enum ApplicationStatus {
         SUBMITTED,

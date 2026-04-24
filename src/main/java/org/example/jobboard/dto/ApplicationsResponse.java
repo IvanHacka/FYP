@@ -35,6 +35,7 @@ public class ApplicationsResponse {
     private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
 
+
 // Input field when apply
     private String whyGoodFit;
     private BigDecimal expectedSalary;

@@ -4,8 +4,11 @@
     background: #f5f7fa;
 }
 
-/* TITLE BAR (instead of header with logout) */
+/* title (employee dashboard) */
 .dashboard-title-bar {
+    position: sticky;
+    top:72px ;
+    z-index: 99;
     background: white;
     padding: 20px 40px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -21,6 +24,9 @@
 
 /* TABS */
 .dashboard-tabs {
+    position: sticky;
+    top: 146px;
+    z-index: 98;
     background: white;
     padding: 0 40px;
     display: flex;
@@ -173,33 +179,121 @@
 }
 
 .job-card {
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    transition: all 0.3s;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    transition: all 0.2s ease;
 }
 
 .job-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
 }
 
 .job-card-content {
-    padding: 20px;
+    padding: 24px;
 }
 
 .job-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    gap: 16px;
+    margin-bottom: 14px;
 }
 
 .job-header h3 {
     margin: 0;
-    color: #2c3e50;
-    font-size: 20px;
+    color: #1f2937;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.heart-btn {
+    font-size: 1.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+    color: pink;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.heart-btn:hover {
+    transform: scale(1.05);
+}
+
+.heart-btn.saved {
+    color: red;
+}
+
+.btn-danger {
+    background: red;
+    color: white;
+    border: 1px solid red;
+}
+
+.btn-danger:hover {
+    background: darkred;
+    border-color: darkred;
+}
+
+.job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 14px;
+    color: darkgrey;
+    font-size: 0.95rem;
+}
+
+.job-description {
+    color: #374151;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+}
+
+.job-skills-preview {
+    margin-bottom: 14px;
+}
+
+.job-skills-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.job-skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.job-skill-tag {
+    background: #eef2ff;
+    color: darkslateblue;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.job-match-score {
+    color: darkslateblue;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.job-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
 }
 
 .status-badge {
@@ -222,8 +316,30 @@
 
 .status-pending {
     background: #fff3cd;
-    color: #f39c12;
+    color: #b45309;
 }
+
+.status-accepted {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.status-withdrawn {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+.status-submitted { background: #e5e7eb; }
+.status-under_review { background: #fef3c7; }
+.status-shortlisted { background: #dbeafe; }
+.status-rejected { background: #fee2e2; }
+.status-accepted { background: #dcfce7; }
+.status-withdrawn { background: #f3f4f6; }
 
 .job-meta {
     display: flex;

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -79,6 +80,10 @@ public class ApplicationService {
                     .employerNotes(app.getEmployerNotes())
                     .reviewedAt(app.getReviewedAt())
                     .createdAt(app.getCreatedAt())
+                    .shortlistedAt(app.getShortlistedAt())
+                    .rejectedAt(app.getRejectedAt())
+                    .acceptedAt(app.getAcceptedAt())
+                    .withdrawnAt(app.getWithdrawnAt())
                     .matchScore(breakdowns.getFinalScore())
                     .skillScore(breakdowns.getSkillScore())
                     .salaryScore(breakdowns.getSalaryScore())
@@ -226,6 +231,13 @@ public class ApplicationService {
 
         application.setStatus(status);
         application.setEmployerNotes(employerNotes);
+
+        switch (status) {
+            case UNDER_REVIEW -> application.setReviewedAt(LocalDateTime.now());
+            case SHORTLISTED -> application.setShortlistedAt(LocalDateTime.now());
+            case REJECTED -> application.setRejectedAt(LocalDateTime.now());
+            case ACCEPTED -> application.setAcceptedAt(LocalDateTime.now());
+        }
         application.setReviewedAt(java.time.LocalDateTime.now());
 
         Application saved = applicationRepo.save(application);
