@@ -65,7 +65,7 @@ public class User implements UserDetails {
     private String companyWebsite;
 
     @Column(name = "company_description", columnDefinition = "TEXT")
-    private String description;
+    private String companyDescription;
 
     // Should be an url or employee cv
     private String cv;

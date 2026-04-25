@@ -3,11 +3,16 @@ package org.example.jobboard.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.jobboard.dto.EmployeePreferenceRequest;
+import org.example.jobboard.dto.EmployeePreferenceResponse;
 import org.example.jobboard.dto.ExperienceRequest;
+import org.example.jobboard.dto.ProfileCompletionResponse;
 import org.example.jobboard.model.Experience;
+import org.example.jobboard.model.Preference;
 import org.example.jobboard.model.User;
 import org.example.jobboard.repo.EmployeeSkillRepo;
 import org.example.jobboard.repo.ExperienceRepo;
+import org.example.jobboard.repo.PreferenceRepo;
 import org.example.jobboard.repo.UserRepo;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +25,7 @@ public class ProfileService {
     private final UserRepo userRepo;
     private final ExperienceRepo experienceRepo;
     private final EmployeeSkillRepo employeeSkillRepo;
+    private final PreferenceRepo preferenceRepo;
 
     // add new experience
     @Transactional
@@ -86,43 +92,83 @@ public class ProfileService {
 //    }
 
     // calculate completion of profile setup
-    public int profileCompletion(Long userId) {
+    public ProfileCompletionResponse profileCompletion(Long userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        boolean hasBasicInfo = user.getFullName() != null && !user.getFullName().trim().isEmpty()
+                && user.getBio() != null && !user.getBio().trim().isEmpty()
+                && user.getPhone() != null && !user.getPhone().trim().isEmpty()
+                && user.getAddress() != null && !user.getAddress().trim().isEmpty();
+
+        Long count = employeeSkillRepo.countByUserId(userId);
+        long skillCount = count != null ? count : 0L;
+
+        boolean hasExperience = user.getExperiences() != null && !user.getExperiences().isEmpty();
+        boolean hasEducation = user.getEducation() != null && !user.getEducation().isEmpty();
 
         int score = 0;
 
-        if(user.getFullName() != null && !user.getFullName().isEmpty()) {
-            score += 10;
-        }
-        if(user.getBio() != null && !user.getBio().isEmpty()) {
-            score += 10;
-        }
-        if(user.getPhone() != null && !user.getPhone().isEmpty()) {
-            score += 10;
-        }
-        if(user.getAddress() != null && !user.getAddress().isEmpty()) {
-            score += 10;
+        if (hasBasicInfo) score += 40;
+        score += Math.min((int) skillCount * 4, 20);
+        if (user.hasCv()) score += 20;
+        if (hasExperience) score += 10;
+        if (hasEducation) score += 10;
+
+        return ProfileCompletionResponse.builder()
+                .completionScore(Math.min(score, 100))
+                .hasBasicInfo(hasBasicInfo)
+                .hasSkills(skillCount >= 5)
+                .hasCv(user.hasCv())
+                .hasExperience(hasExperience)
+                .hasEducation(hasEducation)
+                .build();
+    }
+
+    public EmployeePreferenceResponse getEmployeePreferences(Long userId) {
+        Preference preference = preferenceRepo.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Preference not found"));
+
+        if (preference == null) return EmployeePreferenceResponse.builder().build();
+
+        return EmployeePreferenceResponse.builder()
+                .desiredJobTitle(preference.getDesiredJobTitles())
+                .preferredLocations(preference.getPreferredLocations())
+                .minExpectedSalary(preference.getMinExpectedSalary())
+                .jobTypes(preference.getJobTypes())
+                .willingToRelocate(preference.getWillingToRelocate())
+                .availableStartDate(preference.getAvailableStartDate())
+                .build();
+    }
+
+    public EmployeePreferenceResponse updateEmployeePreferences(
+            Long userId,
+            EmployeePreferenceRequest request
+    ) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() != User.Role.EMPLOYEE) {
+            throw new RuntimeException("Only employees can update job preferences");
         }
 
-        Long count = employeeSkillRepo.countByUserId(userId);
-        if(count >= 5) {
-            score += 20;
-        }
-        else{
-            score += (int)(count * 4);
-        }
+        Preference preference = preferenceRepo.findByUserId(userId)
+                    .orElse(Preference.builder().user(user).build());
 
-        if(user.hasCv()){
-            score += 20;
-        }
+        preference.setDesiredJobTitles(request.getDesiredJobTitle());
+        preference.setPreferredLocations(request.getPreferredLocations());
+        preference.setMinExpectedSalary(request.getMinExpectedSalary());
+        preference.setJobTypes(request.getJobTypes());
+        preference.setAvailableStartDate(request.getAvailableStartDate());
+        preference.setWillingToRelocate(request.getWillingToRelocate());
 
-        if(!user.getExperiences().isEmpty()){
-            score += 10;
-        }
-        if(!user.getEducation().isEmpty()){
-            score += 10;
-        }
+        Preference saved = preferenceRepo.save(preference);
 
-        return score;
+        return EmployeePreferenceResponse.builder()
+                .desiredJobTitle(saved.getDesiredJobTitles())
+                .preferredLocations(saved.getPreferredLocations())
+                .minExpectedSalary(saved.getMinExpectedSalary())
+                .jobTypes(saved.getJobTypes())
+                .availableStartDate(saved.getAvailableStartDate())
+                .willingToRelocate(saved.getWillingToRelocate())
+                .build();
     }
 }

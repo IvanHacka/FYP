@@ -41,7 +41,7 @@ public class EmployeeApplicationResponse {
     private String companyWebsite;
     private String jobLocation;
     private BigDecimal jobMinSalary;
-    private String jobDescription;
+    private String companyDescription;
 
 
 }

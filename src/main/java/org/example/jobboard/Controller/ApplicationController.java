@@ -46,9 +46,7 @@ public class ApplicationController {
         Application application = applicationService.jobApply(
                 request.getJobId(),
                 applicant.getId(),
-                request.getWhyGoodFit(),
-                request.getExpectedSalary(),
-                request.getAvailableStartDate()
+                request.getWhyGoodFit()
         );
 
         return ResponseEntity.ok(application);

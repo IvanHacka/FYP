@@ -2,8 +2,7 @@ package org.example.jobboard.Controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.jobboard.dto.ExperienceRequest;
-import org.example.jobboard.dto.ProfileUpdateRequest;
+import org.example.jobboard.dto.*;
 import org.example.jobboard.model.*;
 import org.example.jobboard.repo.DocumentRepo;
 import org.example.jobboard.service.ProfileService;
@@ -50,8 +49,8 @@ public class ProfileController {
             @AuthenticationPrincipal UserDetails userDetails
     ){
         User user = userService.getUserByEmail(userDetails.getUsername());
-        int completionScore = profileService.profileCompletion(user.getId());
-        return ResponseEntity.ok(new ProfileCompletionResponse(completionScore));
+        ProfileCompletionResponse completionResponse = profileService.profileCompletion(user.getId());
+        return ResponseEntity.ok(completionResponse);
     }
 
     // PUT api/profile/update
@@ -232,12 +231,33 @@ public class ProfileController {
         return ResponseEntity.ok(new HasCvResponse(hasCv));
     }
 
+    @GetMapping("/preferences")
+    public ResponseEntity<EmployeePreferenceResponse> getEmployeePreferences(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        return ResponseEntity.ok(
+                profileService.getEmployeePreferences(user.getId())
+        );
+    }
+
+    @PutMapping("/preferences")
+    public ResponseEntity<EmployeePreferenceResponse> updateEmployeePreferences(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody EmployeePreferenceRequest request
+    ) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        return ResponseEntity.ok(
+                profileService.updateEmployeePreferences(user.getId(), request)
+        );
+    }
+
 
     // helper
     // return a clearer message (json) instead of hasCv (true/false)
 
     record HasCvResponse(boolean hasCv) {
     }
-    record ProfileCompletionResponse(int completionScore) {}
-
 }

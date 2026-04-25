@@ -28,15 +28,13 @@ public class Preference {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @ElementCollection
     @CollectionTable(name = "desired_job_titles", joinColumns = @JoinColumn(name = "preference_id"))
     @Column(name = "job_title")
-    private List<String> desiredJobTitles;
+    private String desiredJobTitles;
 
-    @ElementCollection
     @CollectionTable(name = "preferred_locations", joinColumns = @JoinColumn(name = "preference_id"))
     @Column(name = "location")
-    private List<String> preferredLocations;
+    private String preferredLocations;
 
     @Column(name = "min_expected_salary")
     private BigDecimal minExpectedSalary;
@@ -50,7 +48,8 @@ public class Preference {
     @ElementCollection
     @CollectionTable(name = "preferred_job_types", joinColumns = @JoinColumn(name = "preference_id"))
     @Column(name = "job_type")
-    private List<String> jobTypes;
+    @Enumerated(EnumType.STRING)
+    private List<Job.JobType> jobTypes;
 
     @Column(name = "willing_to_relocate")
     private Boolean willingToRelocate = false;

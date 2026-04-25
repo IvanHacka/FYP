@@ -501,6 +501,53 @@
     border-radius: 8px;
 }
 
+.suggestion-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.suggestion-list li {
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.suggestion-list li:hover {
+    background: #f3f4f6;
+}
+
+.suggestion-list span {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: #24364b;
+}
+
+.checkbox-label input {
+    width: 18px;
+    height: 18px;
+}
+
 /*Testing*/
 .empty-state {
     text-align: center;

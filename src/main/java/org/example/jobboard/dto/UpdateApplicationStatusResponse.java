@@ -17,4 +17,8 @@ public class UpdateApplicationStatusResponse {
     private String status;
     private String employerNotes;
     private LocalDateTime reviewedAt;
+    private LocalDateTime shortlistedAt;
+    private LocalDateTime rejectedAt;
+    private LocalDateTime acceptedAt;
+    private LocalDateTime withdrawnAt;
 }

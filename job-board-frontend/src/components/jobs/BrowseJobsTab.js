@@ -109,30 +109,17 @@ function BrowseJobsTab() {
     const handleApply = async (jobId) => {
         const form = applyFormByJob[jobId] || {};
         const whyGoodFit = (form.whyGoodFit || '').trim();
-        const expectedSalary = form.expectedSalary;
-        const availableStartDate = form.availableStartDate;
 
         if (!whyGoodFit) {
             alert('Please enter why you are a good fit');
             return;
         }
 
-        if (expectedSalary && Number(expectedSalary) <= 0) {
-            alert('Expected salary must be greater than 0');
-            return;
-        }
-
-        if (!availableStartDate) {
-            alert('Please enter your available start date');
-            return;
-        }
 
         try {
             await applyJob(
                 jobId,
                 whyGoodFit,
-                expectedSalary ? Number(expectedSalary) : null,
-                availableStartDate
             );
 
             alert('Application submitted successfully');
@@ -417,43 +404,6 @@ function BrowseJobsTab() {
                                                             }))
                                                         }
                                                         placeholder="Explain why your skills and experience fit this role"
-                                                    />
-                                                </div>
-
-                                                <div className="form-group" style={{ marginBottom: '10px' }}>
-                                                    <label>Expected Salary</label>
-                                                    <input
-                                                        type="number"
-                                                        className="form-control"
-                                                        value={applyFormByJob[job.id]?.expectedSalary || ''}
-                                                        onChange={(e) =>
-                                                            setApplyFormByJob(prev => ({
-                                                                ...prev,
-                                                                [job.id]: {
-                                                                    ...prev[job.id],
-                                                                    expectedSalary: e.target.value
-                                                                }
-                                                            }))
-                                                        }
-                                                        placeholder="Enter your expected salary"
-                                                    />
-                                                </div>
-
-                                                <div className="form-group" style={{ marginBottom: '10px' }}>
-                                                    <label>Available Start Date</label>
-                                                    <input
-                                                        type="date"
-                                                        className="form-control"
-                                                        value={applyFormByJob[job.id]?.availableStartDate || ''}
-                                                        onChange={(e) =>
-                                                            setApplyFormByJob(prev => ({
-                                                                ...prev,
-                                                                [job.id]: {
-                                                                    ...prev[job.id],
-                                                                    availableStartDate: e.target.value
-                                                                }
-                                                            }))
-                                                        }
                                                     />
                                                 </div>
 

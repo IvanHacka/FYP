@@ -4,6 +4,7 @@ package org.example.jobboard.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.example.jobboard.model.Job;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +30,13 @@ public class ApplicationsResponse {
     private String applicantCv;
 
     private List<DocumentResponse> applicantDocuments;
+// Preferences
+    private String desiredJobTitles;
+    private String preferredLocation;
+    private Boolean willingToRelocate;
+    private BigDecimal preferredSalary;
+    private List<Job.JobType> preferredJobTypes;
+    private LocalDate availableStartDate;
 // Application information
     private String status;
     private String employerNotes;
@@ -36,10 +44,9 @@ public class ApplicationsResponse {
     private LocalDateTime createdAt;
 
 
+
 // Input field when apply
     private String whyGoodFit;
-    private BigDecimal expectedSalary;
-    private LocalDate availableStartDate;
 
     private BigDecimal matchScore;
     private BigDecimal skillScore;

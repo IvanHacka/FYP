@@ -247,6 +247,7 @@
 ## Week 18
 **What I did this week:**
 - Fixed DTO issues and added missing fields.
+- Moved preferences to profile to fix logic error on matching score.
 - Corrected timeline logic and added timestamps.
 - Resolved frontend/backend inconsistencies.
 - Verified full system workflow end-to-end.

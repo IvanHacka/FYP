@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/jobs/search", "/api/jobs").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/profile/completion").hasRole("EMPLOYEE")
+                        .requestMatchers("/api/institutions/search").hasRole("EMPLOYEE")
                         .anyRequest().authenticated() // Other request require token
                 )
                 .sessionManagement(ses-> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

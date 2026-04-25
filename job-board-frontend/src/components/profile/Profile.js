@@ -2,15 +2,24 @@ import React, {useState, useEffect} from 'react';
 import {getProfileCompletion} from "../../api/api.js";
 import ProfileCompletion from './ProfileCompletion';
 import ExperienceSection from './ExperienceSection';
+import EducationSection from './EducationSection';
 import DocumentsSection from './DocumentSection';
 import SkillsSection from './SkillsSection';
+import PreferenceSection from "./PreferenceSection";
 import CompanyProfileSection from "./CompanyProfileSection";
 import './ProfileStyle.css';
 import BasicInfoSection from "./BasicInfoSection";
 
 function ProfilePage({role}) {
     const [activeTab, setActiveTab] = useState(role === 'EMPLOYEE'? 'basic' : 'company');
-    const [completion, setCompletion] = useState(0);
+    const [completion, setCompletion] = useState({
+        completionScore: 0,
+        hasBasicInfo: false,
+        hasSkills: false,
+        hasCv: false,
+        hasExperience: false,
+        hasEducation: false
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -20,7 +29,7 @@ function ProfilePage({role}) {
     const loadProfileCompletion = async () => {
         try {
             const response = await getProfileCompletion();
-            setCompletion(response.data.completionPercentage);
+            setCompletion(response.data);
         } catch (error) {
             console.error('Error loading profile completion:', error);
         } finally {
@@ -40,7 +49,7 @@ function ProfilePage({role}) {
         <div className="profile-page">
             <div className="profile-header">
                 <h1>My Profile</h1>
-                <ProfileCompletion percentage={completion} />
+                <ProfileCompletion completion={completion} />
             </div>
 
 
@@ -62,6 +71,13 @@ function ProfilePage({role}) {
                         </button>
 
                         <button
+                            className={activeTab === 'education' ? 'tab active' : 'tab'}
+                            onClick={() => setActiveTab('education')}
+                        >
+                            Education
+                        </button>
+
+                        <button
                             className={activeTab === 'documents' ? 'tab active' : 'tab'}
                             onClick={() => setActiveTab('documents')}
                         >
@@ -73,6 +89,12 @@ function ProfilePage({role}) {
                             onClick={() => setActiveTab('skills')}
                         >
                             Skills
+                        </button>
+                        <button
+                            className={activeTab === 'preferences' ? 'tab active' : 'tab'}
+                            onClick={() => setActiveTab('preferences')}
+                        >
+                            Job Preferences
                         </button>
                     </>
                 )}
@@ -93,12 +115,20 @@ function ProfilePage({role}) {
                 {activeTab === 'experience' && role === 'EMPLOYEE' && (
                     <ExperienceSection onUpdate={handleProfileUpdate} />
                 )}
+                {activeTab === 'education' && role === 'EMPLOYEE' && (
+                    <EducationSection onUpdate={handleProfileUpdate} />
+                )}
                 {activeTab === 'documents' && role === 'EMPLOYEE' && (
                     <DocumentsSection onUpdate={handleProfileUpdate} />
                 )}
                 {activeTab === 'skills' && role === 'EMPLOYEE' && (
                     <SkillsSection onUpdate={handleProfileUpdate} />
                 )}
+                {activeTab === 'preferences' && role === 'EMPLOYEE' && (
+                    <PreferenceSection onUpdate={handleProfileUpdate} />
+                )}
+
+                {/*Company*/}
                 {activeTab === 'company' && role === 'EMPLOYER' && (
                     <CompanyProfileSection onUpdate={handleProfileUpdate} />
                 )}

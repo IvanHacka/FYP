@@ -8,7 +8,6 @@ import org.example.jobboard.repo.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,9 +20,9 @@ public class ApplicationService {
     private final MatchingService matchingService;
     private final DocumentRepo documentRepo;
     private final ApplicationStatusHistoryRepo applicationStatusHistoryRepo;
+    private final PreferenceRepo preferenceRepo;
 
-    public Application jobApply(Long jobId, Long userId, String whyGoodFit,
-                                BigDecimal expectedSalary, LocalDate availableStartDate) {
+    public Application jobApply(Long jobId, Long userId, String whyGoodFit) {
 
         if (applicationRepo.existsByApplicantIdAndJobId(userId, jobId)) {
             throw new RuntimeException("You have already applied for the job with id " + jobId);
@@ -45,18 +44,12 @@ public class ApplicationService {
 
         BigDecimal score = matchingService.calculateMatchScore(jobId, userId);
 
-        if (expectedSalary != null && expectedSalary.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Expected salary must be greater than 0");
-        }
-
         Application application = Application.builder()
                 .job(job)
                 .applicant(applicant)
                 .matchScore(score)
                 .coverLetterDocument(applicant.getCurrentCoverLetter())
                 .whyGoodFit(whyGoodFit)
-                .expectedSalary(expectedSalary)
-                .availableStartDate(availableStartDate)
                 .status(Application.ApplicationStatus.SUBMITTED)
                 .build();
 
@@ -107,7 +100,7 @@ public class ApplicationService {
                     )
                     .jobLocation(app.getJob() != null ? app.getJob().getLocation() : null)
                     .jobMinSalary(app.getJob() != null ? app.getJob().getMinSalary() : null)
-                    .jobDescription(app.getJob() != null ? app.getJob().getDescription() : null)
+                    .companyDescription(app.getJob() != null ? app.getJob().getDescription() : null)
                     .build();
                 })
                 .toList();
@@ -153,7 +146,6 @@ public class ApplicationService {
                             .reviewedAt(app.getReviewedAt())
                             .createdAt(app.getCreatedAt())
                             .whyGoodFit(app.getWhyGoodFit())
-                            .expectedSalary(app.getExpectedSalary())
                             .availableStartDate(app.getAvailableStartDate())
                             .matchScore(breakdowns.getFinalScore())
                             .skillScore(breakdowns.getSkillScore())
@@ -176,6 +168,9 @@ public class ApplicationService {
                             app.getJob().getId(),
                             app.getApplicant().getId()
                     );
+                    Preference preference = app.getApplicant() != null
+                            ? preferenceRepo.findByUserId(app.getApplicant().getId()).orElse(null) :
+                            null;
 
                     return ApplicationsResponse.builder()
                             .applicationId(app.getId())
@@ -207,8 +202,12 @@ public class ApplicationService {
                             .reviewedAt(app.getReviewedAt())
                             .createdAt(app.getCreatedAt())
                             .whyGoodFit(app.getWhyGoodFit())
-                            .expectedSalary(app.getExpectedSalary())
-                            .availableStartDate(app.getAvailableStartDate())
+                            .desiredJobTitles(preference != null ? preference.getDesiredJobTitles() : null)
+                            .preferredLocation(preference != null ? preference.getPreferredLocations() : null)
+                            .willingToRelocate(preference != null ? preference.getWillingToRelocate() : null)
+                            .preferredSalary(preference != null ? preference.getMinExpectedSalary() : null)
+                            .preferredJobTypes(preference != null ? preference.getJobTypes() : List.of())
+                            .availableStartDate(preference != null ? preference.getAvailableStartDate() : null)
                             .matchScore(breakdowns.getFinalScore())
                             .skillScore(breakdowns.getSkillScore())
                             .salaryScore(breakdowns.getSalaryScore())
@@ -237,8 +236,8 @@ public class ApplicationService {
             case SHORTLISTED -> application.setShortlistedAt(LocalDateTime.now());
             case REJECTED -> application.setRejectedAt(LocalDateTime.now());
             case ACCEPTED -> application.setAcceptedAt(LocalDateTime.now());
+            case WITHDRAWN -> application.setWithdrawnAt(LocalDateTime.now());
         }
-        application.setReviewedAt(java.time.LocalDateTime.now());
 
         Application saved = applicationRepo.save(application);
 
@@ -256,6 +255,10 @@ public class ApplicationService {
                 .status(saved.getStatus().name())
                 .employerNotes(saved.getEmployerNotes())
                 .reviewedAt(saved.getReviewedAt())
+                .shortlistedAt(saved.getShortlistedAt())
+                .rejectedAt(saved.getRejectedAt())
+                .acceptedAt(saved.getAcceptedAt())
+                .withdrawnAt(saved.getWithdrawnAt())
                 .build();
     }
 
@@ -293,8 +296,21 @@ public class ApplicationService {
             throw new RuntimeException("This application can no longer be withdrawn");
         }
 
+        Application.ApplicationStatus oldStatus = application.getStatus();
+
         application.setStatus(Application.ApplicationStatus.WITHDRAWN);
-        return applicationRepo.save(application);
+        application.setWithdrawnAt(LocalDateTime.now());
+        Application saved = applicationRepo.save(application);
+        ApplicationStatusHistory history = ApplicationStatusHistory.builder()
+                .application(saved)
+                .oldStatus(oldStatus)
+                .newStatus(Application.ApplicationStatus.WITHDRAWN)
+                .employerNotes(null)
+                .build();
+
+        applicationStatusHistoryRepo.save(history);
+        return saved;
+
     }
 
     private List<DocumentResponse> mapApplicantDocuments(Long applicantId) {

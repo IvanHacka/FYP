@@ -119,7 +119,7 @@ const BasicProfileSection = ({ onUpdate }) => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            placeholder="+1 (555) 123-4567"
+                            placeholder="+44 (0)1234567890"
                         />
                     </div>
 

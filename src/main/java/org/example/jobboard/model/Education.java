@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -37,8 +38,13 @@ public class Education {
     @Column(name = "field_of_study")
     private String fieldOfStudy;
 
-    @Column(name = "graduation_year")
-    private Integer graduationYear;
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "graduation_date")
+    private LocalDate graduationDate;
+
+    private String description;
 
     private String grade;
 

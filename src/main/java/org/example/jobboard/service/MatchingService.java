@@ -166,102 +166,106 @@ public class MatchingService {
     }
 
     private BigDecimal calculateLocationScore(Job job, Preference preference) {
-        if (preference == null || preference.getPreferredLocations() == null
-                || preference.getPreferredLocations().isEmpty()) {
-            return BigDecimal.valueOf(50.00);
+        if (preference == null) {
+            return BigDecimal.valueOf(50);
         }
 
-        String jobLocation = job.getLocation().trim().toLowerCase();
+        String preferredLocation = preference.getPreferredLocations();
+        Boolean willingToRelocate = preference.getWillingToRelocate();
 
-        // for remote
-        if (jobLocation.contains("remote") && preference.getPreferredLocations().stream()
-                .anyMatch(location -> location.trim().toLowerCase().contains("remote"))) {
-            return BigDecimal.valueOf(100.00);
+        if (job.getLocation() == null || job.getLocation().isBlank()) {
+            return BigDecimal.valueOf(50);
         }
 
-        boolean match = preference.getPreferredLocations().stream()
-                .filter(location -> location != null && !location.isBlank())
-                .map(v -> v.trim().toLowerCase())
-                .anyMatch(prefLocation ->
-                        jobLocation.contains(prefLocation) || prefLocation.contains(jobLocation)
-                );
-
-        if (match) {
-            return BigDecimal.valueOf(100.00);
+        if (preferredLocation == null || preferredLocation.isBlank()) {
+            return Boolean.TRUE.equals(willingToRelocate)
+                    ? BigDecimal.valueOf(70)
+                    : BigDecimal.valueOf(50);
         }
 
-        if (Boolean.TRUE.equals(preference.getWillingToRelocate())) {
-            return BigDecimal.valueOf(70.00);
+        String jobLocation = job.getLocation().toLowerCase();
+        String preferred = preferredLocation.toLowerCase();
+
+        if (jobLocation.contains(preferred) || preferred.contains(jobLocation)) {
+            return BigDecimal.valueOf(100);
         }
 
-        return BigDecimal.ZERO;
+        if (jobLocation.contains("remote")) {
+            return BigDecimal.valueOf(90);
+        }
+
+        if (Boolean.TRUE.equals(willingToRelocate)) {
+            return BigDecimal.valueOf(75);
+        }
+
+        return BigDecimal.valueOf(30);
     }
 
     private BigDecimal calculateTitleScore(Job job, Preference preference) {
-        if (preference == null || preference.getDesiredJobTitles() == null
-                || preference.getDesiredJobTitles().isEmpty()) {
-            return BigDecimal.valueOf(50.00);
+        if (job == null || job.getTitle() == null || job.getTitle().isBlank()) {
+            return BigDecimal.valueOf(50);
+        }
+
+        if (preference == null ||
+                preference.getDesiredJobTitles() == null ||
+                preference.getDesiredJobTitles().isBlank()) {
+            return BigDecimal.valueOf(50);
         }
 
         String jobTitle = job.getTitle().trim().toLowerCase();
+        String[] desiredTitles = preference.getDesiredJobTitles().toLowerCase().split(",");
 
-        for (String desiredTitle : preference.getDesiredJobTitles()) {
-            if (desiredTitle == null || desiredTitle.isBlank()) {
+        BigDecimal bestScore = BigDecimal.ZERO;
+
+        for (String dt : desiredTitles) {
+            String desiredTitle = dt.trim();
+
+            if (desiredTitle.isBlank()) continue;
+
+            if (jobTitle.equals(desiredTitle)) {
+                return BigDecimal.valueOf(100);
+            }
+
+            if (jobTitle.contains(desiredTitle) || desiredTitle.contains(jobTitle)) {
+                bestScore = bestScore.max(BigDecimal.valueOf(100));
                 continue;
             }
 
-            String normalizedDesiredTitle = desiredTitle.trim().toLowerCase();
 
-            // Exact match
-            if (jobTitle.equals(normalizedDesiredTitle)) {
-                return BigDecimal.valueOf(100.00);
-            }
-
-            // Contains
-            if (jobTitle.contains(normalizedDesiredTitle) || normalizedDesiredTitle.contains(jobTitle)) {
-                return BigDecimal.valueOf(100.00);
-            }
-
-            // Partial match
+            // Partial wording
             String[] jobWords = jobTitle.split("\\s+");
-            String[] desiredWords = normalizedDesiredTitle.split("\\s+");
+            String[] desiredWords = desiredTitle.split("\\s+");
 
             long matchingWords = Arrays.stream(jobWords)
                     .filter(word -> Arrays.asList(desiredWords).contains(word))
                     .count();
 
-            if (matchingWords >= 2) { // At least 2 words match
-                return BigDecimal.valueOf(80.00);
+            if (matchingWords >= 2) {
+                return BigDecimal.valueOf(80);
+            }
+
+            if (matchingWords == 1) {
+                return BigDecimal.valueOf(60);
             }
         }
 
-        return BigDecimal.ZERO;
+        return BigDecimal.valueOf(30);
     }
 
     private BigDecimal calculateJobTypeScore(Job job, Preference preference) {
-        if (preference == null || preference.getJobTypes() == null || preference.getJobTypes().isEmpty()) {
-            return BigDecimal.valueOf(50.00);
+        if (job == null || job.getJobType() == null) {
+            return BigDecimal.valueOf(50);
         }
 
-        if (job.getJobType() == null) {
-            return BigDecimal.valueOf(50.00);
+        if (preference == null ||
+                preference.getJobTypes() == null || preference.getJobTypes().isEmpty()) {
+            return BigDecimal.valueOf(50);
         }
 
-        String jobType = (job.getJobType().name()).trim().toLowerCase();
-
-        boolean match = preference.getJobTypes().stream()
-                .filter(type -> type != null && !type.isBlank())
-                .map(v -> v.trim().toLowerCase())
-                .anyMatch(type -> type.equals(jobType));
-
-        if (match){
-            return BigDecimal.valueOf(100.00);
-        }
-        else{
-            return BigDecimal.ZERO;
-        }
+        return preference.getJobTypes().contains(job.getJobType())
+                ? BigDecimal.valueOf(100)
+                : BigDecimal.valueOf(30);
     }
-
 
 
 

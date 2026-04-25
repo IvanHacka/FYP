@@ -47,25 +47,27 @@ function MyApplications() {
     const buildTimeline = (app) => {
         const timeline = [];
 
-        if (app.createdAt) {
+        if (app.createdAt){
             timeline.push({ label: 'Application Submitted', date: app.createdAt});
         }
 
-        if (app.reviewedAt) {
+        if (app.reviewedAt){
             timeline.push({ label: 'Under Review', date: app.reviewedAt});
         }
 
-        if (app.shortlistedAt) {
+        if (app.shortlistedAt){
             timeline.push({ label: 'Shortlisted', date: app.shortlistedAt});
         }
 
-        if (app.rejectedAt) {
+        if (app.rejectedAt){
             timeline.push({ label: 'Rejected', date: app.rejectedAt });
         }
 
-        if (app.acceptedAt) {
-            timeline.push({ label: 'Rejected', date: app.acceptedAt });
+        if (app.acceptedAt){
+            timeline.push({ label: 'Accepted', date: app.acceptedAt });
         }
+
+        if (app.withdrawnAt){}
 
 
         return timeline;

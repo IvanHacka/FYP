@@ -26,7 +26,7 @@ public class EmployerController {
         // Add field
         user.setCompanyName(employerProfileRequest.getCompanyName());
         user.setCompanyWebsite(employerProfileRequest.getCompanyWebsite());
-        user.setDescription(employerProfileRequest.getDescription());
+        user.setCompanyDescription(employerProfileRequest.getDescription());
         return ResponseEntity.ok(userRepo.save(user));
     }
 }

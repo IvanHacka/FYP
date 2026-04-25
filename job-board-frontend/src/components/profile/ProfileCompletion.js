@@ -1,9 +1,11 @@
 import React from 'react';
 import "/Users/haymac/Desktop/FYP/redo/JobBoard/job-board-frontend/src/components/profile/ProfileStyle.css";
 
-const ProfileCompletion = ({ percentage }) => {
+const ProfileCompletion = ({completion}) => {
+
+    const percentage = completion?.completionScore ?? 0;
     const getCompletionMessage = () => {
-        if (percentage >= 100) return '🎉 Your profile is completed!';
+        if (percentage >= 100) return 'You are ready to be employed!!';
         if (percentage >= 80) return 'Almost there! Few steps ahead.';
         if (percentage >= 60) return 'Good progress! Keep going.';
         if (percentage >= 40) return 'You are making some progress!';
@@ -13,17 +15,24 @@ const ProfileCompletion = ({ percentage }) => {
     const getSuggestions = () => {
         const suggestions = [];
 
-        if (percentage < 30) {
-            suggestions.push('Upload your CV to stand out');
+        if (!completion?.hasBasicInfo) {
+            suggestions.push('Complete your basic information');
         }
-        if (percentage < 50) {
+
+        if (!completion?.hasCv) {
+            suggestions.push('Upload your CV');
+        }
+
+        if (!completion?.hasSkills) {
+            suggestions.push('Add skills');
+        }
+
+        if (!completion?.hasExperience) {
             suggestions.push('Add your work experience');
         }
-        if (percentage < 70) {
-            suggestions.push('List your skills');
-        }
-        if (percentage < 90) {
-            suggestions.push('Add education and certificates');
+
+        if (!completion?.hasEducation) {
+            suggestions.push('Add your education');
         }
 
         return suggestions;

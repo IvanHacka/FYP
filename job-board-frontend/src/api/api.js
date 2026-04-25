@@ -20,20 +20,20 @@ api.interceptors.request.use((config) => {
 
 // api
 // AUTH
-export const register = (userData) => {
+export const register = (userData) =>{
     return api.post('/auth/register', userData);
 }
-export const login = (email, password) => {
+export const login = (email, password) =>{
     return api.post('/auth/login', {email, password});
 };
 
 // Profile
 
 export const getProfileCompletion = () =>{
-    return api.get('/employees/profile/completion');
+    return api.get('/profile/completion');
 }
 
-export const getProfile = () => {
+export const getProfile = () =>{
     return api.get('/profile/me');
 };
 
@@ -53,13 +53,41 @@ export const updateExperience = (id, experienceData) => {
     return api.put(`/profile/experiences/${id}`, experienceData);
 };
 
-export const deleteExperience = (id) => {
+export const deleteExperience = (id) =>{
     return api.delete(`/profile/experience/${id}`);
 };
 
+export const getEducation = () => {
+    return api.get('/education');
+};
+
+export const addEducation = (data) =>{
+    return api.post('/education', data);
+};
+
+export const updateEducation = (educationId, data) =>{
+    return api.put(`/education/${educationId}`, data);
+};
+
+export const deleteEducation = (educationId) =>{
+    return api.delete(`/education/${educationId}`);
+};
+
+export const searchInstitutions = (institution) => {
+    return api.get(`/institutions/search?institution=${encodeURIComponent(institution)}`);
+}
+
+export const getEmployeePreferences = () => {
+    return api.get('/profile/preferences');
+}
+
+export const updateEmployeePreferences = (data) => {
+    return api.put('/profile/preferences', data);
+}
+
 // Documents
 
-export const getDocuments = () => {
+export const getDocuments = () =>{
     return api.get('/profile/documents');
 }
 
@@ -74,7 +102,7 @@ export const uploadDocument = (file, documentType) => {
         });
 };
 
-export const downloadDocument = (documentId) => {
+export const downloadDocument = (documentId) =>{
     return api.get(`/profile/documents/download/${documentId}`,
         {responseType: 'blob'}); // important
 };

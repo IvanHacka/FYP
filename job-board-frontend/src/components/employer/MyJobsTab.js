@@ -625,22 +625,44 @@ function MyJobsTab() {
                                                                 gap: '16px',
                                                                 flexWrap: 'wrap'
                                                             }}>
-                                                        <div>
-                                                            <strong>{app.applicantFullName || 'Unknown'}</strong>
-                                                            <div style={{color: '#7f8c8d', fontSize: '0.9rem'}}>
-                                                                {app.applicantEmail}
-                                                            </div>
-                                                            <div style={{
-                                                                color: '#2563eb',
-                                                                fontWeight: 600,
-                                                                marginTop: '4px'
-                                                            }}>
-                                                                Match Score: {app.matchScore ?? 'N/A'}%
-                                                            </div>
-                                                            <div style={{color: '#666', fontSize: '0.85rem'}}>
-                                                                Status: {app.status || 'SUBMITTED'}
-                                                            </div>
-                                                        </div>
+                                                                <div>
+                                                                    <strong>{app.applicantFullName || 'Unknown'}</strong>
+                                                                    <div style={{color: '#7f8c8d', fontSize: '0.9rem'}}>
+                                                                        {app.applicantEmail}
+                                                                    </div>
+                                                                    <div style={{
+                                                                        color: '#2563eb',
+                                                                        fontWeight: 600,
+                                                                        marginTop: '4px'
+                                                                    }}>
+                                                                        Match Score: {app.matchScore ?? 'N/A'}%
+                                                                    </div>
+                                                                    <div style={{color: '#666', fontSize: '0.85rem'}}>
+                                                                        Status: {app.status || 'SUBMITTED'}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="detail-box">
+                                                                    <h4>Applicant Preferences</h4>
+
+                                                                    <div><strong>Preferred Job Title:
+                                                                    </strong> {app.desiredJobTitles || 'Not provided'}
+                                                                    </div>
+                                                                    <div><strong>Preferred Location:
+                                                                    </strong> {app.preferredLocation || 'Not provided'}
+                                                                    </div>
+                                                                    <div><strong>Willing to Relocate:
+                                                                    </strong> {app.willingToRelocate ? 'Yes' : 'No'}
+                                                                    </div>
+                                                                    <div><strong>Expected Salary:
+                                                                    </strong> {app.preferredSalary ? `£${Number(app.preferredSalary).toLocaleString()}` : 'Not provided'}
+                                                                    </div>
+                                                                    <div><strong>Preferred Job
+                                                                        Types:</strong> {app.preferredJobTypes?.length ? app.preferredJobTypes.join(', ') : 'Not provided'}
+                                                                    </div>
+                                                                    <div><strong>Available Start
+                                                                        Date:</strong> {app.availableStartDate || 'Not provided'}
+                                                                    </div>
+                                                                </div>
 
                                                                 <div style={{
                                                                     display: 'flex',
@@ -727,7 +749,7 @@ function MyJobsTab() {
                                                                             color: '#666',
                                                                             fontSize: '0.85rem'
                                                                         }}>
-                                                                            Reviewed: {new Date(app.reviewedAt).toLocaleString()}
+                                                                        Reviewed: {new Date(app.reviewedAt).toLocaleString()}
                                                                         </div>
                                                                     )}
 
@@ -874,9 +896,9 @@ function MyJobsTab() {
                                                                     )}
                                                                 </div>
                                                             )}
-                                                        </div>
-                                                    )}
-                                                </li>
+                                                                </div>
+                                                            )}
+                                                        </li>
                                             ))}
                                         </ul>
                                     )}
