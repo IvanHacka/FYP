@@ -225,7 +225,7 @@ function BrowseJobsTab() {
                         </div>
 
                         <div className="input-group">
-                            <label htmlFor="minSalary">$ Min Salary $</label>
+                            <label htmlFor="minSalary">£ Min Salary £</label>
                             <input
                                 type="number"
                                 id="minSalary"
@@ -308,7 +308,7 @@ function BrowseJobsTab() {
 
                                     <div className="job-meta">
                                         <span>✈︎ {job.location || 'Remote'} ✈︎</span>
-                                        <span>$ {job.minSalary?.toLocaleString() || 'Negotiable'} $</span>
+                                        <span>£ {job.minSalary?.toLocaleString() || 'Negotiable'} £</span>
                                         <span>◴ {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently posted'} ◴</span>
                                         <span>ⴵ Expires: {job.expiresAt ? new Date(job.expiresAt).toLocaleDateString() : 'No expiry'} ⴵ</span>
                                     </div>

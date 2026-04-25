@@ -113,7 +113,7 @@ function WatchListPage() {
 
                                     <div className="job-meta">
                                         <span>✈︎ {job.location || 'Remote'} ✈︎</span>
-                                        <span>$ {job.minSalary?.toLocaleString() || 'Negotiable'} $</span>
+                                        <span>£ {job.minSalary?.toLocaleString() || 'Negotiable'} £</span>
                                         <span>◴ {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently posted'} ◴</span>
                                     </div>
 

@@ -242,9 +242,11 @@ function MyJobsTab() {
         const confirmMessage =
             status === 'REJECTED' ?
                 'Are you sure you want to reject this applicant?' :
-                status === 'ACCEPTED' ?
-                    'Are you sure you want to accept this applicant?' :
-                    null;
+            status === 'SHORTLISTED' ?
+                'Are you sure you want to shortlist this applicant?' :
+            status === 'ACCEPTED' ?
+                'Are you sure you want to accept this applicant?' :
+                null;
 
         if (confirmMessage && !window.confirm(confirmMessage)) return;
 
@@ -403,7 +405,7 @@ function MyJobsTab() {
 
                                     <div className="job-meta">
                                         <span>✈︎ {job.location || 'Remote'} ✈︎</span>
-                                        <span>$ {job.minSalary?.toLocaleString() || 'Negotiable'} $</span>
+                                        <span>£ {job.minSalary?.toLocaleString() || 'Negotiable'} £</span>
                                         <span>◴ {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'N/A'} ◴</span>
                                         <span>ⴵ Expires: {job.expiresAt ? new Date(job.expiresAt).toLocaleDateString() : 'No expiry'} ⴵ</span>
                                     </div>
@@ -700,7 +702,7 @@ function MyJobsTab() {
                                                                             </button>
                                                                         )}
 
-                                                                        {(app.status === 'SUBMITTED' || app.status === 'UNDER_REVIEW') && (
+                                                                        {(app.status === 'UNDER_REVIEW') && (
                                                                             <>
                                                                                 <button
                                                                                     className="btn btn-outline btn-sm"
@@ -730,7 +732,7 @@ function MyJobsTab() {
 
                                                                         {/* reversible (Not fully) */}
                                                                         {/* One step back */}
-                                                                        {(app.status === 'UNDER_REVIEW' || app.status === 'SHORTLISTED' || app.status === 'REJECTED') && (
+                                                                        {( app.status === 'SHORTLISTED' || app.status === 'REJECTED') && (
                                                                             <button
                                                                                 className="btn btn-outline btn-sm"
                                                                                 onClick={() => handleApplicationStatusChange(app.applicationId, 'UNDER_REVIEW')}
@@ -805,7 +807,7 @@ function MyJobsTab() {
                                                                         <div>Title: {app.titleScore ?? 'N/A'}%</div>
                                                                         <div>Location: {app.locationScore ?? 'N/A'}%</div>
                                                                         <div>Salary: {app.salaryScore ?? 'N/A'}%</div>
-                                                                        <div>Type: {app.jobTypeScore ?? 'N/A'}%</div>
+                                                                        <div>JobType: {app.jobTypeScore ?? 'N/A'}%</div>
                                                                     </div>
 
                                                                     {app.whyGoodFit && (

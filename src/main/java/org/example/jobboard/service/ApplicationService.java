@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.jobboard.dto.*;
 import org.example.jobboard.model.*;
 import org.example.jobboard.repo.*;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -229,6 +230,27 @@ public class ApplicationService {
         Application.ApplicationStatus oldStatus = application.getStatus();
 
         application.setStatus(status);
+        if (status == Application.ApplicationStatus.REJECTED) {
+            application.setRejectedAt(LocalDateTime.now());
+            application.setShortlistedAt(null);
+            application.setAcceptedAt(null);
+        }
+
+        if (status == Application.ApplicationStatus.SHORTLISTED) {
+            application.setShortlistedAt(LocalDateTime.now());
+            application.setRejectedAt(null);
+        }
+
+        if (status == Application.ApplicationStatus.ACCEPTED) {
+            application.setAcceptedAt(LocalDateTime.now());
+            application.setRejectedAt(null);
+        }
+        if (status == Application.ApplicationStatus.UNDER_REVIEW) {
+            application.setReviewedAt(LocalDateTime.now());
+            application.setShortlistedAt(null);
+            application.setAcceptedAt(null);
+            application.setRejectedAt(null);
+        }
         application.setEmployerNotes(employerNotes);
 
         switch (status) {
