@@ -2,12 +2,13 @@ package org.example.jobboard.Controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.jobboard.dto.InactiveUserResponse;
 import org.example.jobboard.model.User;
 import org.example.jobboard.repo.UserRepo;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -43,22 +44,21 @@ public class AdminController {
     public ResponseEntity<?> getInactive(){
         LocalDateTime fortyDays = LocalDateTime.now().minusDays(40);
         // Specify 40 days
-        List<User> inactive = userRepo.findAllInactive(fortyDays);
-        List<Map<String, Object>> r = inactive.stream().map(user -> {
-            Map<String, Object> info = new HashMap<>();
-            info.put("id", user.getId());
-            info.put("fullName", user.getFullName());
-            info.put("email", user.getEmail());
-            info.put("role", user.getRole());
-            info.put("lastLoginAt", user.getLastLoginAt());
-            info.put("isActive", user.isActive());
-            info.put("warningEmailSent", user.getWarningEmailSent());
-            if (user.getLastLoginAt() != null) {
-                long inactiveDays = java.time.Duration.between(user.getLastLoginAt(), LocalDateTime.now()).toDays();
-                info.put("Inactive days", inactiveDays);
-            }
-            return info;
-        }).toList();
+        List<User> inactive = userRepo.findInactiveUsersForAdmin(fortyDays);
+        List<InactiveUserResponse> r = inactive.stream()
+                .map(user -> InactiveUserResponse.builder()
+                        .id(user.getId())
+                        .fullName(user.getFullName())
+                        .email(user.getEmail())
+                        .role(user.getRole().name())
+                        .lastLoginAt(user.getLastLoginAt())
+                        .daysInactive(Duration.between(user.getLastLoginAt(), LocalDateTime.now()).toDays())
+                        .warningEmailSent(user.getWarningEmailSent())
+                        .reviewEmailSent(user.getReviewEmailSent())
+                        .isActive(user.isEnabled())
+                        .build())
+                .toList();
+
         return ResponseEntity.ok(r);
     }
 

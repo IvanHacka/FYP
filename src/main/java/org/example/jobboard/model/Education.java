@@ -46,7 +46,7 @@ public class Education {
 
     private String description;
 
-    private String grade;
+//    private String grade;
 
     @CreationTimestamp
     @Column(name = "created_at")

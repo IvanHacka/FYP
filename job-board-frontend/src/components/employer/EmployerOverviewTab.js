@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getEmployerApplications } from '../../api/api';
+import React, {useEffect, useState} from 'react';
+import {getEmployerApplications} from '../../api/api';
 
 function EmployerOverviewTab() {
     const [allApplications, setAllApplications] = useState([]);

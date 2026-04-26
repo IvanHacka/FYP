@@ -161,14 +161,6 @@ function WatchListPage() {
                                                 Apply Now 𓂃✍︎
                                             </button>
                                         )}
-
-                                        <button
-                                            className="btn btn-outline btn-sm"
-                                            onClick={() => handleRemove(job.jobId)}
-                                            type="button"
-                                        >
-                                            Remove from Watchlist
-                                        </button>
                                     </div>
                                 </div>
                             </li>

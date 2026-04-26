@@ -13,7 +13,7 @@ public class EmailService {
     public void sendInactiveWarning(String receiver, String userName, int inactivePeriod){
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(receiver);
-        message.setSubject("Account Inactive Warning"+userName);
+        message.setSubject("Account Inactive Warning "+userName);
         message.setText(String.format(
             "Hello %s,\n\n" +
             "We noticed you haven't logged in for %d days.\n\n" +

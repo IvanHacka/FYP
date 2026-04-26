@@ -58,6 +58,10 @@ public class User implements UserDetails {
     @Column(name = "warning_email_sent")
     private Boolean warningEmailSent = false;
 
+    @Column(name = "review_email_sent")
+    private Boolean reviewEmailSent = false;
+
+
     @Column(name = "company_name")
     private String companyName;
 
@@ -67,8 +71,8 @@ public class User implements UserDetails {
     @Column(name = "company_description", columnDefinition = "TEXT")
     private String companyDescription;
 
-    // Should be an url or employee cv
-    private String cv;
+//    // Should be an url or employee cv
+//    private String cv;
 
     @Column(columnDefinition = "TEXT")
     private String bio;
@@ -98,9 +102,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Education> education = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<Certificate> certificates = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -120,25 +121,15 @@ public class User implements UserDetails {
     private Set<Skill> skills = new HashSet<>();
 
 
-    // get latest cv
-    public Document getCurrentCv(){
-        if (documents == null || documents.isEmpty()){
-            return null;
-        }
-        return documents.stream().filter(doc -> doc.getDocumentType() == Document.DocumentType.CV)
-                .max((doc1, doc2) -> doc1.getUploadedAt().compareTo(doc2.getUploadedAt()))
-                .orElse(null); // null if no cv
-    }
-
-    // get latest cover letter
-    public Document getCurrentCoverLetter(){
-        if (documents == null || documents.isEmpty()){
-            return null;
-        }
-        return documents.stream().filter(doc -> doc.getDocumentType() == Document.DocumentType.COVER_LETTER)
-                .max((doc1, doc2) -> doc1.getUploadedAt().compareTo(doc2.getUploadedAt()))
-                .orElse(null); // null if no cover letter
-    }
+//    // get latest cover letter
+//    public Document getCurrentCoverLetter(){
+//        if (documents == null || documents.isEmpty()){
+//            return null;
+//        }
+//        return documents.stream().filter(doc -> doc.getDocumentType() == Document.DocumentType.COVER_LETTER)
+//                .max((doc1, doc2) -> doc1.getUploadedAt().compareTo(doc2.getUploadedAt()))
+//                .orElse(null); // null if no cover letter
+//    }
 
     // check if user has cv
     public boolean hasCv(){

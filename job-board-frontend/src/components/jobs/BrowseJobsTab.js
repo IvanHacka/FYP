@@ -415,14 +415,6 @@ function BrowseJobsTab() {
                                                 </button>
                                             </div>
                                         )}
-
-                                        <button
-                                            className="btn btn-outline btn-sm"
-                                            onClick={() => toggleWatchList(job.id)}
-                                            type="button"
-                                        >
-                                            {isSaved ? 'Remove from Watchlist' : 'Save Job'}
-                                        </button>
                                     </div>
                                 </div>
                             </li>

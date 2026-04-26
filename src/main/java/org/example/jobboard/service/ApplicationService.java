@@ -49,7 +49,6 @@ public class ApplicationService {
                 .job(job)
                 .applicant(applicant)
                 .matchScore(score)
-                .coverLetterDocument(applicant.getCurrentCoverLetter())
                 .whyGoodFit(whyGoodFit)
                 .status(Application.ApplicationStatus.SUBMITTED)
                 .build();
@@ -125,7 +124,6 @@ public class ApplicationService {
                             .applicantId(app.getApplicant() != null ? app.getApplicant().getId() : null)
                             .applicantFullName(app.getApplicant() != null ? app.getApplicant().getFullName() : null)
                             .applicantEmail(app.getApplicant() != null ? app.getApplicant().getEmail() : null)
-                            .applicantCv(app.getApplicant() != null ? app.getApplicant().getCv() : null)
 //                            .applicantDocuments(
 //                                    app.getApplicant() != null && app.getApplicant().getDocuments() != null
 //                                            ? app.getApplicant().getDocuments().stream()
@@ -185,7 +183,6 @@ public class ApplicationService {
                             .applicantLinkedinUrl(app.getApplicant() != null ? app.getApplicant().getLinkedinUrl() : null)
                             .applicantPortfolioUrl(app.getApplicant() != null ? app.getApplicant().getPortfolioUrl() : null)
                             .applicantBio(app.getApplicant() != null ? app.getApplicant().getBio() : null)
-                            .applicantCv(app.getApplicant() != null ? app.getApplicant().getCv() : null)
                             .applicantDocuments(
                                     app.getApplicant() != null && app.getApplicant().getDocuments() != null ?
                                             app.getApplicant().getDocuments().stream()

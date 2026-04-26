@@ -184,6 +184,8 @@ export const updateJobExpiry = (jobId, expiresAt) => {
     return api.put(`/jobs/${jobId}/expiry`, { expiresAt });
 };
 
+// Watch List
+
 export const getWatchList = () => {
     return api.get('/watchList');
 };
@@ -258,7 +260,7 @@ export const getAllUsers = () => {
 
 
 export const getInactiveUsers = () => {
-    return api.get('/admin/inactive-users');
+    return api.get('/admin/inactive');
 };
 
 // Ban user

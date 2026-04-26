@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getEmployeeApplications, withdrawApplication } from "../../api/api";
+import {getEmployeeApplications, withdrawApplication} from "../../api/api";
 
 function MyApplications() {
     const [applications, setApplications] = useState([]);

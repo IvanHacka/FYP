@@ -19,17 +19,18 @@ public class InactiveScheduler {
     private final UserRepo userRepo;
     private final EmailService emailService;
 
-    @Scheduled(cron = "0 0 2 * * *")
+//    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "*/30 * * * * *")
     public void checkInactiveUsers() {
         // Use log to see timestamp
         log.info("Checking inactive users...");
         LocalDateTime thirtyDays = LocalDateTime.now().minusDays(30);
         LocalDateTime fourtyDays = LocalDateTime.now().minusDays(40);
 
-        List<User> thirtyDaysUsers = userRepo.findUsersInactive(thirtyDays);
+        List<User> thirtyDaysUsers = userRepo.findUsersInactiveBetween30And40(thirtyDays, fourtyDays);
 
         for(User user : thirtyDaysUsers) {
-            if(!user.getWarningEmailSent()){
+            if(!Boolean.TRUE.equals(user.getWarningEmailSent())){
                 try{
                     emailService.sendInactiveWarning(user.getEmail(), user.getFullName(), 30);
                     user.setWarningEmailSent(true);
@@ -42,13 +43,13 @@ public class InactiveScheduler {
 
             }
         }
-        List<User> fourtyDaysUsers = userRepo.findUsersInactive(fourtyDays);
+        List<User> fourtyDaysUsers = userRepo.findUsersInactiveOver40(fourtyDays);
 
-        for(User user : thirtyDaysUsers) {
-            if(!user.getWarningEmailSent()){
+        for(User user : fourtyDaysUsers) {
+            if(!Boolean.TRUE.equals(user.getReviewEmailSent())){
                 try{
                     emailService.sendAccountReview(user.getEmail(), user.getFullName());
-                    user.setWarningEmailSent(true);
+                    user.setReviewEmailSent(true);
                     userRepo.save(user);
                     log.info("Successfully sent 40 days warning email to: {}", user.getEmail());
                 }

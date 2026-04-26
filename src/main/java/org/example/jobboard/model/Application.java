@@ -39,8 +39,8 @@ public class Application {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(columnDefinition = "TEXT")
-    private String coverLetter;
+//    @Column(columnDefinition = "TEXT")
+//    private String coverLetter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cover_letter_document_id")
@@ -79,7 +79,7 @@ public class Application {
     @Column(name = "withdrawn_at")
     private LocalDateTime withdrawnAt;
 
-    // might send a form or a invitation if shortlisted ?
+    // Status enum
     public enum ApplicationStatus {
         SUBMITTED,
         UNDER_REVIEW,

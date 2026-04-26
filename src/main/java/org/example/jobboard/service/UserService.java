@@ -28,6 +28,14 @@ public class UserService {
             // return error message if so
             throw new RuntimeException("Email address already in use");
         }
+        if (userRegisterRequest.getRole() == null) {
+            userRegisterRequest.setRole(User.Role.EMPLOYEE);
+        }
+
+        if (userRegisterRequest.getRole() == User.Role.ADMIN) {
+            throw new IllegalArgumentException("Admin registration is not allowed");
+        }
+
         String companyName = null;
         if(userRegisterRequest.getRole() == User.Role.EMPLOYER) {
             if(userRegisterRequest.getCompanyName() == null || userRegisterRequest.getCompanyName().isEmpty()) {

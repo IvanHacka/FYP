@@ -7,7 +7,7 @@ function Login(){
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState(localStorage.getItem('role') || 'EMPLOYEE');
+    const [role, setRole] = useState("EMPLOYEE");
     const [companyName, setCompanyName] = useState('');
 
     const navigate = useNavigate();
